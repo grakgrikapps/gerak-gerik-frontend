@@ -4,6 +4,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import theme from "@/lib/mui/theme";
 import { StoreProvider } from "./StoreProvider";
+import Main_layout from "@/components/layout/_main.layout";
 
 export default function RootLayout(props) {
   return (
@@ -14,7 +15,7 @@ export default function RootLayout(props) {
             <ThemeProvider theme={theme}>
               {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
               <CssBaseline />
-              {props.children}
+              <Main_layout>{props.children}</Main_layout>
             </ThemeProvider>
           </AppRouterCacheProvider>
         </StoreProvider>
