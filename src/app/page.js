@@ -1,19 +1,25 @@
 "use client";
 
 import * as React from "react";
-import { Avatar, Box, Button, Typography } from "@mui/material";
-import VerifiedRoundedIcon from "@mui/icons-material/VerifiedRounded";
+import Box from "@mui/material/Box";
+import http from "@/lib/axios/http";
 
-// import {
-//   selectCount,
-//   selectStatus,
-// } from "@/lib/rtk/features/counter/counterSlice";
-
-// import { useAppDispatch, useAppSelector } from "@/lib/rtk/hooks";
+import Post_profile from "@/components/shared/profile/post.profile";
 
 export default function Home() {
-  // const count = useAppSelector(selectCount);
-  // const status = useAppSelector(selectStatus);
+  const [details, setDetails] = React.useState({});
+
+  React.useEffect(() => {
+    // Example of using a Redux action or any other side effect
+    (async () => {
+      http.get("/posts").then((res) => {
+        // setData(res?.data);
+        http.get(`/posts/${res?.data[0]?.id}`).then((_res) => {
+          setDetails(_res?.data);
+        });
+      });
+    })();
+  }, []);
 
   return (
     <>
@@ -24,50 +30,26 @@ export default function Home() {
           width="100%"
           bgcolor="lightgrey"
           borderRadius="15px"
-        />
+        >
+          <Box
+            component="iframe"
+            borderRadius="15px"
+            width="100%"
+            height="100%"
+            src={`${details?.videos?.[0]?.url}?autoplay=1&mute=1`}
+            title="YouTube video player"
+            frameBorder="0"
+            allowFullScreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          ></Box>
+        </Box>
 
         {/* Profile */}
-        <Box
-          display="flex"
-          width="100%"
-          gap={1}
-          height="95px"
-          paddingY="10px"
-        >
-          <Avatar />
-
-          <Box width="100%">
-            <Box display="flex" width="100%" justifyContent="space-between">
-              <Box mb={0} display="flex" alignItems="center" gap={0.4}>
-                <Typography variant="h5">Nama</Typography>
-                <VerifiedRoundedIcon
-                  htmlColor="#1673EE"
-                  sx={{ fontSize: "14px" }}
-                />
-                <Typography color="textDisabled">@namanama</Typography>
-              </Box>
-
-              <Typography color="textDisabled">1h ago</Typography>
-            </Box>
-            <Typography>
-              Caption - Lorem ipsum dolor sit amet, consectetur adipiscing sit
-              amet sit amet...
-            </Typography>
-
-            <Button
-              size="small"
-              color="inherit"
-              sx={{
-                minWidth: "fit-content",
-                height: "0px",
-                padding: "0px",
-                textTransform: "lowercase",
-              }}
-            >
-              Selengkapnya
-            </Button>
-          </Box>
-        </Box>
+        <Post_profile
+          profile={details?.profile}
+          description={details?.description}
+          createdAt={details?.createdAt}
+        />
       </Box>
     </>
   );
