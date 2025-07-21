@@ -136,7 +136,6 @@ function BottomBar_comment(props) {
           }}
         >
           <TextField
-            id="outlined-basic"
             placeholder="Tambahkan komentar..."
             variant="outlined"
             size="small"

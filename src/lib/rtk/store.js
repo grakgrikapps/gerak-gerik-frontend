@@ -1,17 +1,16 @@
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
-import { counterSlice } from "./features/counter/counterSlice";
-import { quotesApiSlice } from "./features/quotes/quotesApiSlice";
+import { postsSlice } from "./features/posts/postSlice";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
 
 // Gabungkan slice
-const rootReducer = combineSlices(counterSlice, quotesApiSlice);
+const rootReducer = combineSlices(postsSlice);
 
 // Konfigurasi persist
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: [counterSlice.name], // hanya persist state `counter`, jangan quotesApi
+  whitelist: [postsSlice.name], // hanya persist state `counter`, jangan quotesApi
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -32,7 +31,7 @@ export const makeStore = () => {
             "persist/REGISTER",
           ],
         },
-      }).concat(quotesApiSlice.middleware),
+      }),
   });
 
   return store;

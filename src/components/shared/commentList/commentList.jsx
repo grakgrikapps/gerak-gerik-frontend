@@ -146,7 +146,7 @@ function CommentList(props) {
                 mt: 0.5,
               }}
             >
-              {expanded ? "lebih sedikit" : "tampilkan lebih banyak"}
+              {expanded ? "Lebih sedikit" : "Tampilkan lebih banyak"}
             </Button>
           )}
 
