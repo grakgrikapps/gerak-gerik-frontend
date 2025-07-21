@@ -38,7 +38,7 @@ function Post_profile(props) {
       justifyContent="space-between"
     >
       <Grid size={1}>
-        <Avatar src={props?.profile?.photo} />
+        <Avatar src={props?.profile?.photo ?? null} />
       </Grid>
 
       <Grid size={10.6}>

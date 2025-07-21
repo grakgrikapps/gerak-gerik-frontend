@@ -12,18 +12,26 @@ import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import CommentList from "@/components/shared/commentList/commentList";
 import SentimentSatisfiedAltRoundedIcon from "@mui/icons-material/SentimentSatisfiedAltRounded";
 
+import { useSelector, useDispatch } from "react-redux";
+import { setComment } from "@/lib/rtk/features/posts/postSlice";
+
 function BottomBar_comment(props) {
+  const dispatch = useDispatch();
+
   const [comments, setComments] = React.useState([]);
   const [newComment, setNewComment] = React.useState("");
   const [isSending, setIsSending] = React.useState(false);
 
-  const postId = props?.postId || 7; // Default to 7 if not provided
+  const posts = useSelector((state) => state.posts);
+
+  const postId = posts?.current?.id;
 
   React.useEffect(() => {
-    http.get(`/comments?post_id=${postId}`).then((_res) => {
-      setComments(_res?.data);
-    });
-  }, []);
+    if (props?.open)
+      http.get(`/comments?post_id=${postId}`).then((res) => {
+        dispatch(setComment(res?.data ?? []));
+      });
+  }, [props?.open]);
 
   const handleComment = async () => {
     const trimmed = newComment.trim();
@@ -46,11 +54,11 @@ function BottomBar_comment(props) {
       replies: [],
     };
 
-    setComments((prev) => [tempComment, ...prev]);
+    dispatch(setComment([tempComment, ...posts?.comments]));
     setNewComment("");
 
     try {
-      const res = await http.post("/comments", {
+      await http.post("/comments", {
         post_id: postId,
         comment: trimmed,
       });
@@ -59,7 +67,10 @@ function BottomBar_comment(props) {
     } catch (err) {
       console.error("Gagal kirim komentar:", err);
       // Rollback optimistic update jika mau
-      setComments((prev) => prev.filter((c) => c.id !== tempComment.id));
+
+      dispatch(
+        setComment(posts?.comments.filter((c) => c.id !== tempComment.id))
+      );
     } finally {
       setIsSending(false);
     }
@@ -106,7 +117,7 @@ function BottomBar_comment(props) {
           }}
         >
           {React.Children.toArray(
-            comments.map((comment) => (
+            posts?.comments?.map((comment) => (
               <CommentList
                 key={comment?.id}
                 id={comment?.id}

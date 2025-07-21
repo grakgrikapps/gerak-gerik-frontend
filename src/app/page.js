@@ -10,10 +10,14 @@ import {
   setCurrentPost,
 } from "@/lib/rtk/features/posts/postSlice";
 import { useDispatch, useSelector } from "react-redux";
+import ReactPlayer from "react-player";
 
 export default function Home() {
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts);
+
+  const [muted, setMuted] = React.useState(true);
+  const playerRef = React.useRef(null);
 
   React.useEffect(() => {
     if (posts?.initiation?.length === 0)
@@ -24,11 +28,11 @@ export default function Home() {
   }, [posts]);
 
   React.useEffect(() => {
-     if (posts?.initiation?.length !== 0 && !posts?.current)
-       http.get(`/posts/${posts?.initiation?.[0]?.id}`).then((res) => {
-         dispatch(setCurrentPost(res.data));
-       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (posts?.initiation?.length !== 0 && !posts?.current)
+      http.get(`/posts/${posts?.initiation?.[0]?.id}`).then((res) => {
+        dispatch(setCurrentPost(res.data));
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [posts]);
 
   return (
@@ -40,18 +44,33 @@ export default function Home() {
           width="100%"
           bgcolor="lightgrey"
           borderRadius="15px"
+          className="player-wrapper"
         >
-          <Box
-            component="iframe"
-            borderRadius="15px"
+          <ReactPlayer
+            src="https://www.youtube.com/watch?v=LXb3EKWsInQ"
+            light={`https://img.youtube.com/vi/LXb3EKWsInQ/0.jpg`}
             width="100%"
             height="100%"
-            src={`${posts?.current?.videos?.[0]?.url}?autoplay=1&mute=1`}
-            title="YouTube video player"
-            frameBorder="0"
-            allowFullScreen
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          ></Box>
+            ref={playerRef}
+            playsInline
+            playing
+            controls
+            muted={muted}
+            onPlay={(e) => {
+              setMuted(false);
+            }}
+            config={{
+              file: {
+                attributes: {
+                  // autoPlay: true,
+                  muted: muted,
+                },
+              },
+            }}
+            // controls={true}
+            style={{ borderRadius: "15px", overflow: "hidden" }}
+            className="iframe-player"
+          />
         </Box>
 
         {/* Profile */}

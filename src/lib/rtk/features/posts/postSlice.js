@@ -4,6 +4,7 @@ import { createAppSlice } from "@/lib/rtk/createAppSlice";
 const initialState = {
   initiation: [],
   current: null,
+  comments: []
 };
 
 // Slice definition
@@ -17,8 +18,11 @@ export const postsSlice = createAppSlice({
     setCurrentPost: create.reducer((state, action) => {
       state.current = action.payload;
     }),
+    setComment: create.reducer((state, action) => {
+      state.comments = action.payload;
+    }),
   }),
 });
 
 // Action creators
-export const { initiationPost, setCurrentPost } = postsSlice.actions;
+export const { initiationPost, setCurrentPost, setComment } = postsSlice.actions;
