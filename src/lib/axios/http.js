@@ -9,9 +9,7 @@ const http = axios.create({
 // Add a request interceptor
 http.interceptors.request.use(
   (config) => {
-    config.headers["Authorization"] =
-      "Bearer " +
-      `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoidXNlciIsImlkIjozLCJlbWFpbCI6ImFkbWluZ3Jpa0BnbWFpbC5jb20iLCJwcm9maWxlX2lkIjo0LCJ1cGRhdGVkQXQiOiIyMDI1LTA3LTE5VDE3OjA0OjE3LjQzMFoiLCJjcmVhdGVkQXQiOiIyMDI1LTA3LTE5VDE3OjA0OjE3LjQzMFoiLCJpYXQiOjE3NTI5NDQ2NTd9.j3LPlb7AsMAW_G3iyoS88l7EmmAEyDckmE48DoU0bkY`;
+    config.headers["Authorization"] = "Bearer " + Cookies.get("token");
     return config;
      
   },

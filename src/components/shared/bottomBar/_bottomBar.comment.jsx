@@ -18,11 +18,11 @@ import { setComment } from "@/lib/rtk/features/posts/postSlice";
 function BottomBar_comment(props) {
   const dispatch = useDispatch();
 
-  const [comments, setComments] = React.useState([]);
   const [newComment, setNewComment] = React.useState("");
   const [isSending, setIsSending] = React.useState(false);
 
   const posts = useSelector((state) => state.posts);
+  const auth = useSelector((state) => state.auth.profile);
 
   const postId = posts?.current?.id;
 
@@ -44,9 +44,9 @@ function BottomBar_comment(props) {
       id: Date.now(),
       comment: trimmed,
       profile: {
-        username: "you",
-        fullname: "Your Name",
-        photo: "/placeholder.jpg", // Sesuaikan default
+        username: auth?.profile?.username,
+        fullname: auth?.profile?.fullname,
+        photo: auth?.profile?.photo, // Sesuaikan default
       },
       createdAt: new Date().toISOString(),
       upvote: [],

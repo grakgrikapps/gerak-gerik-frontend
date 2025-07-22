@@ -1,7 +1,7 @@
 "use client";
 import { Provider } from "react-redux";
 import { useEffect } from "react";
-import { store, persistor } from "@/lib/rtk/store";
+import { store, persistor } from "@/lib/rtk/stores.js";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { PersistGate } from "redux-persist/integration/react";
 
