@@ -6,14 +6,3 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.iframe-player, .react-player__preview {
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 100% !important;
-  border-radius: 15px !important;
-  -webkit-border-radius: 15px !important;
-  -moz-border-radius: 15px !important;
-  -ms-border-radius: 15px !important;
-  -o-border-radius: 15px !important;
-}

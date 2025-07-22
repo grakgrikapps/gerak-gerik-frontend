@@ -1,10 +1,24 @@
+"use client";
+
 import React from "react";
 import Grid from "@mui/material/Grid";
-import Appbar from "@/components/shared/appBar/_appbar";
-import Bottombar from "@/components/shared/bottomBar/_bottombar";
 import Box from "@mui/material/Box";
+import Bottom_bar from "../shared/bar/bottom.bar";
+import Top_bar from "../shared/bar/top.bar";
+
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 
 function Main_layout({ children }) {
+  const route = useRouter();
+  const auth = useSelector((state) => state.auth);
+
+  // React.useEffect(() => {
+  //   if (!auth?.token) {
+  //     route.replace("/login");
+  //   }
+  // }, []);
+
   return (
     <Grid
       container
@@ -23,10 +37,11 @@ function Main_layout({ children }) {
           display="flex"
           justifyContent="space-between"
           flexDirection="column"
-          height="99dvh"
+          height="99.5dvh"
         >
-          {/* Sidebar or navigation area can go here */}
-          <Appbar />
+          {/* Top Bar */}
+          <Top_bar />
+
           {/* Main content area */}
           <Box
             sx={{
@@ -37,8 +52,9 @@ function Main_layout({ children }) {
           >
             {children}
           </Box>
-          {/* Bottom area */}
-          <Bottombar />
+
+          {/* Bottom Bar */}
+          <Bottom_bar />
         </Box>
       </Grid>
     </Grid>

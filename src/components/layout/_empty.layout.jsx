@@ -1,7 +1,7 @@
+"use client";
+
 import React from "react";
 import Grid from "@mui/material/Grid";
-import Appbar from "@/components/shared/appBar/_appbar";
-import Bottombar from "@/components/shared/bottomBar/_bottombar";
 import Box from "@mui/material/Box";
 
 function Empty_layout({ children }) {
@@ -23,7 +23,7 @@ function Empty_layout({ children }) {
           display="flex"
           justifyContent="space-between"
           flexDirection="column"
-          height="99dvh"
+          height="99.7dvh"
         >
           {/* Main content area */}
           <Box
