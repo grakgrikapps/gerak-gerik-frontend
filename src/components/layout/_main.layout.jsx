@@ -6,19 +6,7 @@ import Box from "@mui/material/Box";
 import Bottom_bar from "../shared/bar/bottom.bar";
 import Top_bar from "../shared/bar/top.bar";
 
-import { useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
-
 function Main_layout({ children }) {
-  const route = useRouter();
-  const auth = useSelector((state) => state.auth);
-
-  // React.useEffect(() => {
-  //   if (!auth?.token) {
-  //     route.replace("/login");
-  //   }
-  // }, []);
-
   return (
     <Grid
       container

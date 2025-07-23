@@ -1,16 +1,16 @@
 import React from "react";
-import Main_layout from "@/components/layout/_main.layout";
 import Logout from "@/components/pages/logout/index";
 import { cookies } from "next/headers";
 
-async function Layout({ children }) {
+async function Layout(props) {
+  const { children } = props;
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
 
   if (!token) {
-    return <Logout />
+    return <Logout />;
   } else {
-    return <Main_layout>{children}</Main_layout>;
+    return <>{children}</>;
   }
 }
 

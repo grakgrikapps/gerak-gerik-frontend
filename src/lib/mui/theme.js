@@ -79,7 +79,7 @@ const theme = createTheme({
           "& .MuiFormHelperText-root": {
             fontSize: "14px !important",
             marginLeft: "0 !important",
-          }
+          },
         },
       },
     },
