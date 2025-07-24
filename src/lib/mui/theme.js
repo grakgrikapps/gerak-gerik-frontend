@@ -73,6 +73,10 @@ const theme = createTheme({
           "& input": {
             fontSize: "16px !important",
           },
+          "& .MuiInputAdornment-root p": {
+            fontSize: "16px !important",
+            color: "#141619",
+          },
           "& fieldset": {
             borderRadius: "8px",
           },
@@ -99,6 +103,18 @@ const theme = createTheme({
       },
       defaultProps: {
         disableElevation: true,
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          // backgroundColor: "red",
+          // minWidth: 0,
+          // maxWidth: 0,
+          fontSize: "12px",
+          textTransform: "capitalize",
+          color: "#141619 !important",
+        },
       },
     },
   },

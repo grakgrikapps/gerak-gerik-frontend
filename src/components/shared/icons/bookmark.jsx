@@ -1,8 +1,8 @@
 import React from "react";
 import { SvgIcon } from "@mui/material";
-function Icon({ color = "#1C1C1C" }) {
+function Icon({ color = "#1C1C1C", size }) {
   return (
-    <SvgIcon sx={{ width: "30px", height: "30px" }}>
+    <SvgIcon sx={size ?? { width: "30px", height: "30px" }}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"

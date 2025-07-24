@@ -1,5 +1,5 @@
 import React from "react";
-import Logout from "@/components/pages/logout/index";
+import Logout from "@/components/pages/(auth)/logout";
 import { cookies } from "next/headers";
 
 async function Layout(props) {

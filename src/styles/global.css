@@ -29,3 +29,19 @@ main {
     }
   }
 }
+
+a {
+  text-decoration: none;
+}
+
+.iframe-player,
+.react-player__preview {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  border-radius: 12px !important;
+  -webkit-border-radius: 12px !important;
+  -moz-border-radius: 12px !important;
+  -ms-border-radius: 12px !important;
+  -o-border-radius: 12px !important;
+}

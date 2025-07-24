@@ -48,7 +48,7 @@ function Share_drawer(props) {
               icon: <img src="/instagram.png" width="50px" />,
             },
           ].map((item) => (
-            <Grid size={2.5}>
+            <Grid size={2.5} key={item.name}>
               <Box
                 display="flex"
                 flexDirection="column"

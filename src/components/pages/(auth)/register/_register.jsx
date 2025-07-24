@@ -29,7 +29,7 @@ const validationSchema = yup.object({
     .required("Please enter password"),
 });
 
-function Login_page() {
+function Register_page() {
   const dispatch = useDispatch();
   const router = useRouter();
   const formik = useFormik({
@@ -56,10 +56,10 @@ function Login_page() {
             "We couldn’t find an account with that email."
           );
         } else {
-             formik.setFieldError(
-               "email",
-               "Something wrong with your email or password."
-             );
+          formik.setFieldError(
+            "email",
+            "Something wrong with your email or password."
+          );
         }
       }
     },
@@ -75,14 +75,62 @@ function Login_page() {
       <Container>
         <Box mb="50px">
           <Typography variant="h1" gutterBottom>
-            Login
-          </Typography>
-          <Typography variant="body2" fontSize="18px">
-            Welcome back to the app
+            Create an account
           </Typography>
         </Box>
 
         <form onSubmit={formik.handleSubmit}>
+          <Box mb={2}>
+            <Typography
+              component="label"
+              htmlFor="name"
+              fontWeight={500}
+              display="block"
+              variant="h4"
+            >
+              Name
+            </Typography>
+
+            <TextField
+              id="name"
+              fullWidth
+              name="name"
+              placeholder="Enter your name"
+              value={formik.values.name}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.name && Boolean(formik.errors.name)}
+              helperText={formik.touched.name && formik.errors.name}
+              margin="dense"
+            />
+          </Box>
+
+          <Box mb={2}>
+            <Typography
+              component="label"
+              htmlFor="email"
+              fontWeight={500}
+              display="block"
+              variant="h4"
+            >
+              Username
+            </Typography>
+
+            <TextField
+              id="username"
+              fullWidth
+              name="username"
+              type="username"
+              placeholder="Enter your username"
+              value={formik.values.username}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.username && Boolean(formik.errors.username)}
+              helperText={formik.touched.username && formik.errors.username}
+              margin="dense"
+            />
+          </Box>
+
           <Box mb={2}>
             <Typography
               component="label"
@@ -135,17 +183,6 @@ function Login_page() {
             />
           </Box>
 
-          <Box mb={1}>
-            <FormControlLabel
-              control={<Checkbox defaultChecked />}
-              label={
-                <Typography variant="body2" fontSize="16px" color="#191D23">
-                  Keep me signed in
-                </Typography>
-              }
-            />
-          </Box>
-
           <Button
             variant="contained"
             size="large"
@@ -153,7 +190,7 @@ function Login_page() {
             type="submit"
             fullWidth
           >
-            Login
+            Sign up
           </Button>
 
           <Box
@@ -163,9 +200,12 @@ function Login_page() {
             mt={2}
             gap="5px"
           >
-            <Link passHref href="/phone">
-              <Typography fontSize="16px" variant="h6" color="#253DC5">
-                Create an account
+            <Typography fontSize="16px" color="#999DA3">
+              Already have an account?
+            </Typography>
+            <Link passHref href="/login">
+              <Typography fontSize="16px" variant="h6" color="#253DC5" >
+                Sign in here
               </Typography>
             </Link>
           </Box>
@@ -175,4 +215,4 @@ function Login_page() {
   );
 }
 
-export default Login_page;
+export default Register_page;

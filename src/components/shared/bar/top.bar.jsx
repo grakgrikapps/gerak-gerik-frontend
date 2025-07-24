@@ -1,6 +1,7 @@
 import React from "react";
 import SearchIcon from "../icons/search";
 import { Avatar, Box, Container, Button, IconButton } from "@mui/material";
+import Link from "next/link";
 
 function Top_bar() {
   return (
@@ -18,9 +19,11 @@ function Top_bar() {
           gap: "10px",
         }}
       >
-        <IconButton size="small">
-          <Avatar sizes="small" />
-        </IconButton>
+        <Link href="/profile">
+          <IconButton size="small">
+            <Avatar sizes="small" />
+          </IconButton>
+        </Link>
 
         <Box
           mt={0.5}
