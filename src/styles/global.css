@@ -45,3 +45,8 @@ a {
   -ms-border-radius: 12px !important;
   -o-border-radius: 12px !important;
 }
+
+
+.MuiInputBase-root::before {
+  border-color: #3C3C434A !important;
+}

@@ -4,6 +4,14 @@ import { createAppSlice } from "@/lib/rtk/createAppSlice";
 const initialState = {
   token: null,
   profile: null,
+  register: {
+    phone: "",
+    birthdate: {
+      day: "",
+      month: "",
+      year: "",
+    },
+  },
 };
 
 // Slice definition
@@ -21,8 +29,21 @@ export const authSlice = createAppSlice({
       state.token = null;
       state.profile = null;
     }),
+    setPhone: create.reducer((state, action) => {
+      state.register = {
+        ...state.register,
+        phone: action.payload,
+      };
+    }),
+    setBirthdate: create.reducer((state, action) => {
+      state.register = {
+        ...state.register,
+        birthdate: action.payload,
+      };
+    }),
   }),
 });
 
 // Action creators
-export const { setToken, setProfile, cleanAuth } = authSlice.actions;
+export const { setToken, setProfile, cleanAuth, setPhone, setBirthdate } =
+  authSlice.actions;

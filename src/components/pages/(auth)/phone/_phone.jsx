@@ -5,18 +5,14 @@ import {
   Box,
   Button,
   Container,
-  FormControlLabel,
   Typography,
   TextField,
-  Checkbox,
   InputAdornment,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { setPhone } from "@/lib/rtk/features/auth/authSlice";
 import { useDispatch } from "react-redux";
 import { useFormik } from "formik";
-import { setToken, setProfile } from "@/lib/rtk/features/auth/authSlice";
-import http from "@/lib/axios/http";
-import Cookies from "js-cookie";
 import * as yup from "yup";
 
 const phoneRegExp =
@@ -26,22 +22,26 @@ const validationSchema = yup.object({
   phone: yup
     .string()
     .matches(phoneRegExp, "Phone number is not valid")
-    .required(),
+    .required("Phone number is required"),
 });
 
 function Phone_page() {
-  const dispatch = useDispatch();
   const router = useRouter();
+  const dispatch = useDispatch();
+
   const formik = useFormik({
     initialValues: {
       phone: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      //   const profile = await http.get("auth/profile");
-      //   dispatch(setProfile(profile.data?.profile));
+      try {
+        dispatch(setPhone(values.phone));
 
-      router.push("/birthdate");
+        router.push("/birthdate");
+      } catch (error) {
+        console.log(error);
+      }
     },
   });
 
@@ -91,6 +91,8 @@ function Phone_page() {
             color="inherit"
             type="submit"
             fullWidth
+            loading={formik.isSubmitting}
+            disabled={formik.isSubmitting || !formik.isValid}
           >
             Continue
           </Button>

@@ -5,29 +5,35 @@ import {
   Box,
   Button,
   Container,
-  FormControlLabel,
   Typography,
   TextField,
-  Checkbox,
-  InputAdornment,
   Grid,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { useFormik } from "formik";
-import { setToken, setProfile } from "@/lib/rtk/features/auth/authSlice";
-import http from "@/lib/axios/http";
-import Cookies from "js-cookie";
+import { setBirthdate } from "@/lib/rtk/features/auth/authSlice";
 import * as yup from "yup";
 
-const phoneRegExp =
-  /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
-
 const validationSchema = yup.object({
-  phone: yup
-    .string()
-    .matches(phoneRegExp, "Phone number is not valid")
-    .required(),
+  day: yup
+    .number()
+    .typeError("Must be a number")
+    .required("Day is required")
+    .min(1, "Day must be at least 1")
+    .max(31, "Day can't be more than 31"),
+  month: yup
+    .number()
+    .typeError("Must be a number")
+    .required("Month is required")
+    .min(1, "Month must be at least 1")
+    .max(12, "Month can't be more than 12"),
+  year: yup
+    .number()
+    .typeError("Must be a number")
+    .required("Year is required")
+    .min(1900, "Too old")
+    .max(new Date().getFullYear(), "Year can't be in the future"),
 });
 
 function Birthdate_page() {
@@ -35,14 +41,19 @@ function Birthdate_page() {
   const router = useRouter();
   const formik = useFormik({
     initialValues: {
-      phone: "",
+      day: "",
+      month: "",
+      year: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      //   const profile = await http.get("auth/profile");
-      //   dispatch(setProfile(profile.data?.profile));
+      try {
+        dispatch(setBirthdate(values));
 
-      router.push("/register");
+        router.push("/register");
+      } catch (error) {
+        console.log(error);
+      }
     },
   });
 
@@ -66,20 +77,22 @@ function Birthdate_page() {
         <form onSubmit={formik.handleSubmit}>
           <Box mb={2}>
             <Grid container spacing={2}>
-              <Grid size={3}>
+              <Grid size={3.5}>
                 <TextField
-                  id="phone"
-                  fullWidth
-                  name="phone"
+                  id="day"
+                  name="day"
                   type="number"
+                  fullWidth
                   inputProps={{ min: 1, max: 31 }}
-                  value={formik.values.phone}
+                  value={formik.values.day}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
+                  error={formik.touched.day && Boolean(formik.errors.day)}
+                  helperText={formik.touched.day && formik.errors.day}
                   margin="dense"
                   sx={{
                     "& input": {
-                      fontSize: "28px !important",
+                      fontSize: "28px",
                       fontWeight: 500,
                       textAlign: "center",
                     },
@@ -90,20 +103,22 @@ function Birthdate_page() {
                   Day
                 </Typography>
               </Grid>
-              <Grid size={3}>
+              <Grid size={3.5}>
                 <TextField
-                  id="phone"
-                  fullWidth
-                  name="phone"
+                  id="month"
+                  name="month"
                   type="number"
-                  inputProps={{ min: 1, max: 31 }}
-                  value={formik.values.phone}
+                  fullWidth
+                  inputProps={{ min: 1, max: 12 }}
+                  value={formik.values.month}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
+                  error={formik.touched.month && Boolean(formik.errors.month)}
+                  helperText={formik.touched.month && formik.errors.month}
                   margin="dense"
                   sx={{
                     "& input": {
-                      fontSize: "28px !important",
+                      fontSize: "28px",
                       fontWeight: 500,
                       textAlign: "center",
                     },
@@ -114,19 +129,22 @@ function Birthdate_page() {
                   Month
                 </Typography>
               </Grid>
-              <Grid size={4}>
+              <Grid size={5}>
                 <TextField
-                  id="phone"
-                  fullWidth
-                  name="phone"
+                  id="year"
+                  name="year"
                   type="number"
-                  value={formik.values.phone}
+                  fullWidth
+                  inputProps={{ min: 1900, max: new Date().getFullYear() }}
+                  value={formik.values.year}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
+                  error={formik.touched.year && Boolean(formik.errors.year)}
+                  helperText={formik.touched.year && formik.errors.year}
                   margin="dense"
                   sx={{
                     "& input": {
-                      fontSize: "28px !important",
+                      fontSize: "28px",
                       fontWeight: 500,
                       textAlign: "center",
                     },
@@ -146,6 +164,8 @@ function Birthdate_page() {
             color="inherit"
             type="submit"
             fullWidth
+            loading={formik.isSubmitting}
+            disabled={formik.isSubmitting || !formik.isValid}
           >
             Continue
           </Button>

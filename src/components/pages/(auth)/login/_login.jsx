@@ -152,6 +152,8 @@ function Login_page() {
             color="inherit"
             type="submit"
             fullWidth
+            loading={formik.isSubmitting}
+            disabled={formik.isSubmitting || !formik.isValid}
           >
             Login
           </Button>

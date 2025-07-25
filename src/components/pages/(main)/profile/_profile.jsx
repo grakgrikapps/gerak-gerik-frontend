@@ -46,7 +46,7 @@ function Profile_Page() {
             <IconButton
               size="small"
               sx={{ backgroundColor: "#00000055", marginTop: "-20px" }}
-              onClick={() => router.back()}
+              onClick={() => router.push('/home')}
             >
               <ChevronLeftIcon color="#fff" />
             </IconButton>
@@ -79,7 +79,7 @@ function Profile_Page() {
                 variant="outlined"
                 size="small"
                 sx={{ borderRadius: "4px", border: "1px solid #000000" }}
-                onClick={() => {}}
+                onClick={() => router.push('/profile/edit')}
               />
             </Box>
 
@@ -155,15 +155,16 @@ function Profile_Page() {
             </Container>
           </Box>
         </Box>
-
-        {/* Content */}
-
-        <Container>
-          <Box mt="20px">
-            <Card_Post />
-          </Box>
-        </Container>
       </Box>
+
+      {/* Content */}
+      <Container>
+        <Box my="20px" display="flex" flexDirection="column" gap="30px">
+          {[...new Array(10)].map((item) => (
+            <Card_Post />
+          ))}
+        </Box>
+      </Container>
     </>
   );
 }
