@@ -2,8 +2,11 @@ import React from "react";
 import SearchIcon from "../icons/search";
 import { Avatar, Box, Container, Button, IconButton } from "@mui/material";
 import Link from "next/link";
+import { useSelector } from "react-redux";
 
 function Top_bar() {
+  const profile = useSelector((state) => state.auth.profile);
+
   return (
     <Box
       display="flex"
@@ -21,7 +24,7 @@ function Top_bar() {
       >
         <Link href="/profile">
           <IconButton size="small">
-            <Avatar sizes="small" />
+            <Avatar sizes="small" src={profile?.photo} />
           </IconButton>
         </Link>
 

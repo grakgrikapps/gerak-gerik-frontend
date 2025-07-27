@@ -5,6 +5,10 @@ const initialState = {
   token: null,
   profile: null,
   register: {
+    email: "",
+    username: "",
+    fullname: "",
+    password: "",
     phone: "",
     birthdate: {
       day: "",
@@ -41,9 +45,18 @@ export const authSlice = createAppSlice({
         birthdate: action.payload,
       };
     }),
+    setRegister: create.reducer((state, action) => {
+      state.register = {
+        ...state.register,
+        email: action.payload.email,
+        username: action.payload.username,
+        fullname: action.payload.fullname,
+        password: action.payload.password,
+      };
+    }),
   }),
 });
 
 // Action creators
-export const { setToken, setProfile, cleanAuth, setPhone, setBirthdate } =
+export const { setToken, setProfile, cleanAuth, setPhone, setBirthdate, setRegister } =
   authSlice.actions;

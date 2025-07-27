@@ -2,7 +2,6 @@ import React from "react";
 import { SvgIcon } from "@mui/material";
 
 function Icon({ color = "#1C1C1C", size }) {
-  console.log(size);
   return (
     <SvgIcon sx={size ?? { width: "15px", height: "15px" }}>
       <svg

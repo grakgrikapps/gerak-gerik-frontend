@@ -12,8 +12,10 @@ import {
 } from "@mui/material";
 import ChevronLeftIcon from "@/components/shared/icons/chevron-left";
 import Card_Post from "@/components/shared/card/post/post.card";
+import http from "@/lib/axios/http";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { setProfile } from "@/lib/rtk/features/auth/authSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 function a11yProps(index) {
   return {
@@ -23,13 +25,21 @@ function a11yProps(index) {
 }
 
 function Profile_Page() {
-  const [value, setValue] = React.useState(0);
-
   const router = useRouter();
+  const dispatch = useDispatch();
+  const profile = useSelector((state) => state.auth.profile);
+
+  const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  React.useEffect(() => {
+    http
+      .get("/auth/profile")
+      .then((res) => dispatch(setProfile(res.data?.profile)));
+  }, []);
 
   return (
     <>
@@ -46,7 +56,7 @@ function Profile_Page() {
             <IconButton
               size="small"
               sx={{ backgroundColor: "#00000055", marginTop: "-20px" }}
-              onClick={() => router.push('/home')}
+              onClick={() => router.push("/home")}
             >
               <ChevronLeftIcon color="#fff" />
             </IconButton>
@@ -72,44 +82,47 @@ function Profile_Page() {
                   marginTop: "-30px",
                   marginLeft: "-10px",
                 }}
+                src={profile?.photo}
               />
 
-              <Chip
+              {/* <Chip
                 label="Edit Profile"
                 variant="outlined"
                 size="small"
                 sx={{ borderRadius: "4px", border: "1px solid #000000" }}
-                onClick={() => router.push('/profile/edit')}
-              />
+                onClick={() => router.push("/profile/edit")}
+              /> */}
             </Box>
 
             {/* Content */}
             <Box>
-              <Typography variant="h5">Pixsellz</Typography>
+              <Typography variant="h5">{profile?.fullname}</Typography>
               <Typography
                 variant="body1"
                 color="#687684"
                 fontSize="14px"
                 sx={{ mt: "1px", mb: "5px" }}
               >
-                @pixsellz
+                @{profile?.username}
               </Typography>
               <Typography variant="body2" color="#141619" fontSize="12px">
-                Digital Goodies Team is a digital community built for learners,
-                thinkers, and builders in the crypto space, this is where we
-                grow and move forward
+                {profile?.bio ?? "No bio yet"}
               </Typography>
             </Box>
 
             {/* Following & Followers */}
             <Box display="flex" mt="10px" gap="20px">
               <Box display="flex" gap="5px" alignItems="center">
-                <Typography variant="h6">217</Typography>
+                <Typography variant="h6">
+                  {profile?.following?.length ?? 0}
+                </Typography>
                 <Typography>Following</Typography>
               </Box>
 
               <Box display="flex" gap="5px" alignItems="center">
-                <Typography variant="h6">217</Typography>
+                <Typography variant="h6">
+                  {profile?.followers?.length ?? 0}
+                </Typography>
                 <Typography>Followers</Typography>
               </Box>
             </Box>
@@ -159,9 +172,9 @@ function Profile_Page() {
 
       {/* Content */}
       <Container>
-        <Box my="20px" display="flex" flexDirection="column" gap="30px">
-          {[...new Array(10)].map((item) => (
-            <Card_Post />
+        <Box mb="20px" display="flex" flexDirection="column" gap="30px">
+          {[...new Array(10)].map((item, key) => (
+            <Card_Post key={key} />
           ))}
         </Box>
       </Container>

@@ -1,54 +1,47 @@
 "use client";
 
 import React from "react";
-import {
-  Box,
-  Button,
-  Container,
-  FormControlLabel,
-  Typography,
-  TextField,
-  Checkbox,
-} from "@mui/material";
+import { Box, Button, Container, Typography, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setRegister } from "@/lib/rtk/features/auth/authSlice";
 import { useFormik } from "formik";
-import { setToken, setProfile } from "@/lib/rtk/features/auth/authSlice";
-import http from "@/lib/axios/http";
-import Cookies from "js-cookie";
 import * as yup from "yup";
 import Link from "next/link";
 
 const validationSchema = yup.object({
+  fullname: yup.string("Please enter your name").required("Name is required"),
+  username: yup
+    .string("Please enter username")
+    .matches(/^[a-zA-Z0-9]+$/, "Username must be alphanumeric only")
+    .min(5, "Username should be at least 5 characters")
+    .required("Username is required"),
   email: yup
     .string("Please enter email")
     .email("Enter a valid email")
-    .required("Please enter email"),
+    .required("Email is required"),
   password: yup
     .string("Please enter password")
-    .required("Please enter password"),
+    .min(8, "Password should be at least 8 characters")
+    .required("Password is required"),
 });
 
 function Register_page() {
+  const auth = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const router = useRouter();
   const formik = useFormik({
     initialValues: {
-      email: "",
-      password: "",
+      fullname: auth?.register?.fullname,
+      username: auth?.register?.username,
+      email: auth?.register?.email,
+      password: auth?.register?.password,
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const request = await http.post("/auth/login", values);
-
-        Cookies.set("token", request?.data?.token);
-        dispatch(setToken(request?.data?.token));
-
-        const profile = await http.get("auth/profile");
-        dispatch(setProfile(profile.data?.profile));
-
-        router.replace("/home");
+        dispatch(setRegister(values));
+        router.push("/phone");
       } catch (error) {
         if (error?.response?.data?.messages === "User not exist") {
           formik.setFieldError(
@@ -92,15 +85,15 @@ function Register_page() {
             </Typography>
 
             <TextField
-              id="name"
+              id="fullname"
               fullWidth
-              name="name"
+              name="fullname"
               placeholder="Enter your name"
-              value={formik.values.name}
+              value={formik.values.fullname}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              error={formik.touched.name && Boolean(formik.errors.name)}
-              helperText={formik.touched.name && formik.errors.name}
+              error={formik.touched.fullname && Boolean(formik.errors.fullname)}
+              helperText={formik.touched.fullname && formik.errors.fullname}
               margin="dense"
             />
           </Box>
@@ -120,7 +113,6 @@ function Register_page() {
               id="username"
               fullWidth
               name="username"
-              type="username"
               placeholder="Enter your username"
               value={formik.values.username}
               onChange={formik.handleChange}
@@ -204,7 +196,7 @@ function Register_page() {
               Already have an account?
             </Typography>
             <Link passHref href="/login">
-              <Typography fontSize="16px" variant="h6" color="#253DC5" >
+              <Typography fontSize="16px" variant="h6" color="#253DC5">
                 Sign in here
               </Typography>
             </Link>

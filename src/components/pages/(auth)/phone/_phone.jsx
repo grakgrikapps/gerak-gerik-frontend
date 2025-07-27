@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { setPhone } from "@/lib/rtk/features/auth/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as yup from "yup";
 
@@ -28,10 +28,11 @@ const validationSchema = yup.object({
 function Phone_page() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
 
   const formik = useFormik({
     initialValues: {
-      phone: "",
+      phone: auth?.register?.phone,
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {

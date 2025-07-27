@@ -165,7 +165,7 @@ function Login_page() {
             mt={2}
             gap="5px"
           >
-            <Link passHref href="/phone">
+            <Link passHref href="/register">
               <Typography fontSize="16px" variant="h6" color="#253DC5">
                 Create an account
               </Typography>

@@ -10,10 +10,16 @@ import {
   Grid,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
-import { setBirthdate } from "@/lib/rtk/features/auth/authSlice";
+import {
+  setBirthdate,
+  setToken,
+  setProfile,
+} from "@/lib/rtk/features/auth/authSlice";
 import * as yup from "yup";
+import http from "@/lib/axios/http";
+import Cookies from "js-cookie";
 
 const validationSchema = yup.object({
   day: yup
@@ -37,20 +43,30 @@ const validationSchema = yup.object({
 });
 
 function Birthdate_page() {
+  const auth = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const router = useRouter();
   const formik = useFormik({
     initialValues: {
-      day: "",
-      month: "",
-      year: "",
+      day: auth?.register?.birthdate?.day,
+      month: auth?.register?.birthdate?.month,
+      year: auth?.register?.birthdate?.year,
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
         dispatch(setBirthdate(values));
+        const request = await http.post(`/auth/register`, {
+          email: auth.register?.email,
+          password: auth.register?.password,
+          fullname: auth.register?.fullname,
+          username: auth?.register?.username,
+        });
 
-        router.push("/register");
+        dispatch(setProfile(request?.data?.result?.profile));
+        dispatch(setToken(request?.data?.token));
+        Cookies.set("token", request?.data?.token);
+
+        window.location.href = "/home";
       } catch (error) {
         console.log(error);
       }
