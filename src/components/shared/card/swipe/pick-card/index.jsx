@@ -1,10 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { use, useCallback, useEffect, useRef, useState } from "react";
 import styles from "./pick-card.module.scss";
-import iconThumbUpFilled from "../thumb-up.svg";
-import iconThumbDownFilled from "../thumb-down.svg";
 import { clamp } from "@/utils/helper";
-import PickCardResult from "../pick-card-result";
+import http from "@/lib/axios/http";
 import ProgressMask from "../progress-mask";
+import { Avatar, Typography } from "@mui/material";
+import { Box, Grid } from "@mui/system";
+import ReactPlayer from "react-player";
+import moment from "moment";
 
 // Fungsi untuk mendapatkan posisi dari mouse/touch
 const getPosition = (event) => {
@@ -20,6 +22,8 @@ function PickCard({ cardList = [], onEvaluate }) {
   const [isInteracting, setIsInteracting] = useState(false);
   const [activeIndex, setActiveIndex] = useState(cardList.length - 1);
   const [progress, setProgress] = useState(0); // animation progress (-1 ~ 1)
+  const [calcWidth, setCalcWidth] = useState(0);
+  const [detail, setDetail] = useState({});
 
   const handleStart = useCallback((e) => {
     document.body.classList.add(styles.fix_container);
@@ -112,33 +116,45 @@ function PickCard({ cardList = [], onEvaluate }) {
     };
   }, [handleMove, handleEnd]);
 
-  const handleEvaluate = (status) => {
-    window.navigator?.vibrate?.(50);
-    const selectedCard = cardList[cardList.length - 1];
+  useEffect(() => {
+    const handleResize = () => {
+      const newWindowDimensions = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
 
-    if (!selectedCard || activeIndex !== cardList.length - 1) return;
+      const viewportHeight = newWindowDimensions.height;
+      const aspectRatio = 16 / 9;
 
-    const $cardAll = document.querySelectorAll(`.${styles.card}`);
-    const selectedCardElement = $cardAll[$cardAll.length - 1];
+      if (newWindowDimensions.width < viewportHeight * aspectRatio) {
+        setCalcWidth(viewportHeight * aspectRatio);
+      } else {
+        setCalcWidth(newWindowDimensions.width);
+      }
+    };
 
-    setProgress(status === "good" ? 1 : -1);
-    selectedCardElement.style.transition = "transform 0.3s ease-in-out";
-    selectedCardElement.style.transform =
-      status === "good"
-        ? `translateX(120%) rotate(-30deg)`
-        : `translateX(-150%) rotate(30deg)`;
+    // Initial setup
+    handleResize();
 
-    setActiveIndex((prev) => prev - 1);
-    setTimeout(() => {
-      setProgress(0);
-      onEvaluate?.(selectedCard, status);
-    }, 300);
-  };
+    // Add event listener
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    http.get(`/posts/${cardList?.[0]?.id}`).then((res) => {
+      setDetail(res?.data);
+    });
+  }, [cardList]);
 
   return (
     <>
       <div className={styles.container}>
-        <PickCardResult />
+        {/* <PickCardResult /> */}
 
         {cardList.map((card, index) => {
           const isActiveCard = index >= activeIndex;
@@ -157,12 +173,20 @@ function PickCard({ cardList = [], onEvaluate }) {
             >
               <div className={styles.card_inner}>
                 <div className={styles.image_wrap}>
-                  <img
-                    src={card.image}
-                    width={600}
-                    height={600}
-                    alt={card.name}
-                    className={styles.image}
+                  <ReactPlayer
+                    height={(calcWidth / 16) * 9}
+                    width={calcWidth}
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      objectFit: "cover",
+                      zIndex: 20,
+                      opacity: 1,
+                    }}
+                    playing={isActiveCard}
+                    src="https://www.youtube.com/watch?v=LXb3EKWsInQ"
                   />
                 </div>
 
@@ -178,14 +202,44 @@ function PickCard({ cardList = [], onEvaluate }) {
         })}
       </div>
 
-      {activeIndex >= 0 && (
+      <Box mt="30px">
+        <Grid container justifyContent="space-between">
+          <Grid>
+            <Avatar src={detail?.profile?.photo} />
+          </Grid>
+          <Grid size={10.5}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Box display="flex" alignItems="center">
+                <Typography variant="h5">
+                  {detail?.profile?.fullname}
+                </Typography>
+                <Typography variant="body2" color="#959595" fontSize="10px">
+                  @{detail?.profile?.username}
+                </Typography>
+              </Box>
+
+              <Typography color="#959595">
+                {moment(detail?.createdAt).fromNow()}
+              </Typography>
+            </Box>
+
+            <Typography>{detail?.description}</Typography>
+          </Grid>
+        </Grid>
+      </Box>
+
+      {/* {activeIndex >= 0 && (
         <div className={styles.button_wrap}>
           <button
             type="button"
             className={styles.bad_button}
             onClick={() => handleEvaluate("bad")}
           >
-            <img src={iconThumbDownFilled} alt="bad" />
+            <img src={"/thumb-down.svg"} alt="bad" />
           </button>
 
           <button
@@ -193,10 +247,10 @@ function PickCard({ cardList = [], onEvaluate }) {
             className={styles.good_button}
             onClick={() => handleEvaluate("good")}
           >
-            <img src={iconThumbUpFilled} alt="good" />
+            <img src={"/thumb-up.svg"} alt="good" />
           </button>
         </div>
-      )}
+      )} */}
     </>
   );
 }

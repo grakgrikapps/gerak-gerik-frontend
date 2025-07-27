@@ -1,8 +1,6 @@
 import { useLayoutEffect, useState } from "react";
 import styles from "./progress-mask.module.scss";
 import { clamp } from "@/utils/helper"; // ubah ke .js jika kamu pakai versi JS murni
-import iconThumbUpFilled from "../thumb-up.svg";
-import iconThumbDownFilled from "../thumb-down.svg";
 
 function ProgressMask({ progress, isInteracting }) {
   const [status, setStatus] = useState(null);
@@ -61,14 +59,14 @@ function ProgressMask({ progress, isInteracting }) {
         <div className={styles.icon_wrap}>
           {isGood && (
             <img
-              src={iconThumbUpFilled}
+              src={"/thumb-up.svg"}
               className={styles.icon_good}
               alt="good"
             />
           )}
           {isBad && (
             <img
-              src={iconThumbDownFilled}
+              src={"/thumb-down.svg"}
               className={styles.icon_bad}
               alt="bad"
             />
