@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import SearchIcon from "../icons/search";
 import { Avatar, Box, Container, Button, IconButton } from "@mui/material";
@@ -24,7 +26,7 @@ function Top_bar() {
       >
         <Link href="/profile">
           <IconButton size="small">
-            <Avatar sizes="small" src={profile?.photo} />
+            <Avatar sizes="small" src={profile?.photo ?? null} />
           </IconButton>
         </Link>
 

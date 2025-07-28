@@ -7,11 +7,19 @@ import {
   clearCommentReplies,
 } from "@/lib/rtk/features/posts/postSlice";
 import { Box, Typography, TextField, IconButton } from "@mui/material";
-
+import { useFormik } from "formik";
 import http from "@/lib/axios/http";
 import SendIcon from "@/components/shared/icons/send";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import Comment_list from "../list/comment/comment.list";
+import * as yup from "yup";
+
+const validationSchema = yup.object({
+  comment: yup
+    .string("Please enter comment")
+    .min(1)
+    .required("Please enter comment"),
+});
 
 function Comment_drawer(props) {
   const dispatch = useDispatch();
@@ -19,11 +27,97 @@ function Comment_drawer(props) {
   const auth = useSelector((state) => state.auth);
   const posts = useSelector((state) => state.posts);
 
-  const [newComment, setNewComment] = React.useState("");
   const [selectedReplies, setSelectedReplies] = React.useState(null);
   const [isSending, setIsSending] = React.useState(false);
 
   const postId = posts?.current?.id;
+
+  const formik = useFormik({
+    initialValues: {
+      comment: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      const trimmed = values.comment.trim();
+      if (!trimmed || isSending) return;
+
+      setIsSending(true);
+
+      // Optimistic update
+      const tempComment = {
+        id: Date.now(),
+        comment: trimmed,
+        profile: {
+          username: auth?.profile?.username,
+          fullname: auth?.profile?.fullname,
+          photo: auth?.profile?.photo, // Sesuaikan default
+        },
+        createdAt: new Date().toISOString(),
+        upvote: [],
+        downvote: [],
+        replies: [],
+        comment_parent: selectedReplies?.id ?? null,
+      };
+
+      try {
+        const request = await http.post("/comments", {
+          post_id: postId,
+          comment: trimmed,
+          comment_parent: selectedReplies?.id ?? null,
+        });
+
+        // checking type replies or not
+        if (!selectedReplies?.id) {
+          dispatch(
+            setComment([
+              { ...tempComment, id: request?.data?.id },
+              ...posts?.comments,
+            ])
+          );
+        } else {
+          dispatch(
+            setCommentReplies({
+              id: selectedReplies?.id,
+              replies: [
+                ...posts?.replies?.[selectedReplies?.id],
+                { ...tempComment, id: request?.data?.id },
+              ],
+            })
+          );
+
+          // increment total comment
+          dispatch(
+            setComment(
+              posts?.comments?.map((item) => {
+                if (item.id === selectedReplies?.id) {
+                  return {
+                    ...item,
+                    replies: [...item.replies, { id: request?.data?.id }],
+                  };
+                } else {
+                  return item;
+                }
+              })
+            )
+          );
+        }
+
+        formik.handleReset();
+
+        // Optional: replace temp comment with actual from server if ID is important
+      } catch (err) {
+        console.error("Gagal kirim komentar:", err);
+        // Rollback optimistic update jika mau
+
+        dispatch(
+          setComment(posts?.comments.filter((c) => c.id !== tempComment.id))
+        );
+      } finally {
+        setIsSending(false);
+        setSelectedReplies(null);
+      }
+    },
+  });
 
   React.useEffect(() => {
     if (props.open) {
@@ -31,65 +125,11 @@ function Comment_drawer(props) {
         dispatch(setComment(res?.data ?? []));
         dispatch(clearCommentReplies()); // clear replies
       });
+    } else {
+      dispatch(setComment([]));
+      dispatch(clearCommentReplies()); // clear replies
     }
   }, [props?.open]);
-
-  const handleComment = async () => {
-    const trimmed = newComment.trim();
-    if (!trimmed || isSending) return;
-
-    setIsSending(true);
-
-    // Optimistic update
-    const tempComment = {
-      id: Date.now(),
-      comment: trimmed,
-      profile: {
-        username: auth?.profile?.username,
-        fullname: auth?.profile?.fullname,
-        photo: auth?.profile?.photo, // Sesuaikan default
-      },
-      createdAt: new Date().toISOString(),
-      upvote: [],
-      downvote: [],
-      replies: [],
-      comment_parent: selectedReplies?.id ?? null,
-    };
-
-    // checking type replies or not
-    if (!selectedReplies?.id) {
-      dispatch(setComment([tempComment, ...posts?.comments]));
-    } else {
-      dispatch(
-        setCommentReplies({
-          id: selectedReplies?.id,
-          replies: [...posts?.replies?.[selectedReplies?.id], tempComment],
-        })
-      );
-    }
-
-    setNewComment("");
-
-    try {
-      await http.post("/comments", {
-        post_id: postId,
-        comment: trimmed,
-        comment_parent: selectedReplies?.id ?? null,
-      });
-
-      // Optional: replace temp comment with actual from server if ID is important
-    } catch (err) {
-      console.error("Gagal kirim komentar:", err);
-      // Rollback optimistic update jika mau
-
-      dispatch(
-        setComment(posts?.comments.filter((c) => c.id !== tempComment.id))
-      );
-    } finally {
-      setIsSending(false);
-      setSelectedReplies(null);
-    }
-  };
 
   return (
     <>
@@ -145,7 +185,10 @@ function Comment_drawer(props) {
                 <Comment_list
                   {...item}
                   handleReplies={() => {
-                    setNewComment(`@${item?.profile?.username} `);
+                    formik.setFieldValue(
+                      "comment",
+                      `@${item?.profile?.username} `
+                    );
                     setSelectedReplies(item);
                     commentInput.current.focus();
                   }}
@@ -155,8 +198,18 @@ function Comment_drawer(props) {
           </AnimatePresence>
         </Box>
 
-        <Box px="15px" py="10px" display="flex" alignItems="center" gap="10px">
+        <Box
+          component="form"
+          onSubmit={formik.handleSubmit}
+          px="15px"
+          py="10px"
+          display="flex"
+          alignItems="center"
+          gap="10px"
+        >
           <TextField
+            id="comment"
+            name="comment"
             inputRef={commentInput}
             placeholder="Add Comment"
             variant="outlined"
@@ -164,21 +217,30 @@ function Comment_drawer(props) {
             multiline
             fullWidth
             sx={{ "& fieldset": { borderRadius: "10px !important" } }}
-            value={newComment}
+            value={formik.values.comment}
             onChange={(e) => {
               if (e.target.value?.length === 0) {
                 setSelectedReplies(null);
               }
 
-              setNewComment(e.target.value);
+              formik.handleChange(e);
             }}
+            onBlur={formik.handleBlur}
+            error={formik.touched.comment && Boolean(formik.errors.comment)}
+            helperText={formik.touched.comment && formik.errors.comment}
           />
 
           <IconButton
-            disabled={isSending || !newComment.trim()}
-            onClick={() => handleComment()}
+            type="submit"
+            disabled={isSending || !formik.values.comment.trim()}
           >
-            <SendIcon />
+            <SendIcon
+              color={
+                isSending || !formik.values.comment.trim()
+                  ? "lightgray"
+                  : "#1C1C1C"
+              }
+            />
           </IconButton>
         </Box>
       </SwipeableDrawer>

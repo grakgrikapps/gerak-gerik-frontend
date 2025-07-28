@@ -146,9 +146,10 @@ function PickCard({ cardList = [], onEvaluate }) {
   }, []);
 
   useEffect(() => {
-    http.get(`/posts/${cardList?.[0]?.id}`).then((res) => {
-      setDetail(res?.data);
-    });
+    if (cardList?.[0]?.id)
+      http.get(`/posts/${cardList?.[0]?.id}`).then((res) => {
+        setDetail(res?.data);
+      });
   }, [cardList]);
 
   return (
