@@ -17,7 +17,7 @@ function Comment_drawer(props) {
   const [newComment, setNewComment] = React.useState("");
   const [isSending, setIsSending] = React.useState(false);
 
-  const postId = 1;
+  const postId = posts?.current?.id;
 
   React.useEffect(() => {
     if (props.open) {
