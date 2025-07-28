@@ -1,7 +1,11 @@
 import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
-import { setComment } from "@/lib/rtk/features/posts/postSlice";
+import {
+  setComment,
+  setCommentReplies,
+  clearCommentReplies,
+} from "@/lib/rtk/features/posts/postSlice";
 import { Box, Typography, TextField, IconButton } from "@mui/material";
 
 import http from "@/lib/axios/http";
@@ -23,8 +27,9 @@ function Comment_drawer(props) {
 
   React.useEffect(() => {
     if (props.open) {
-      http.get(`/comments?post_id=${1}`).then((res) => {
+      http.get(`/comments?post_id=${postId}`).then((res) => {
         dispatch(setComment(res?.data ?? []));
+        dispatch(clearCommentReplies()); // clear replies
       });
     }
   }, [props?.open]);
@@ -51,8 +56,16 @@ function Comment_drawer(props) {
       comment_parent: selectedReplies?.id ?? null,
     };
 
+    // checking type replies or not
     if (!selectedReplies?.id) {
       dispatch(setComment([tempComment, ...posts?.comments]));
+    } else {
+      dispatch(
+        setCommentReplies({
+          id: selectedReplies?.id,
+          replies: [...posts?.replies?.[selectedReplies?.id], tempComment],
+        })
+      );
     }
 
     setNewComment("");
@@ -74,6 +87,7 @@ function Comment_drawer(props) {
       );
     } finally {
       setIsSending(false);
+      setSelectedReplies(null);
     }
   };
 

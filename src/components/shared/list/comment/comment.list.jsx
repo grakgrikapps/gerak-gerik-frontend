@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Avatar,
   Box,
@@ -10,6 +10,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import http from "@/lib/axios/http";
+import { setCommentReplies } from "@/lib/rtk/features/posts/postSlice";
 import moment from "moment";
 import React from "react";
 
@@ -27,14 +28,16 @@ function formatCommentText(text) {
 }
 
 function Comment_list(props) {
+  const dispatch = useDispatch();
+
   const [expanded, setExpanded] = React.useState(false);
   const [upvotes, setUpvotes] = React.useState(props?.upvote || []);
   const [downvotes, setDownvotes] = React.useState(props?.downvote || []);
   const [isVoting, setIsVoting] = React.useState(false);
   const [loadingReply, setLoadingReply] = React.useState(false);
-  const [replies, setReplies] = React.useState([]);
 
   const auth = useSelector((state) => state.auth);
+  const replies = useSelector((state) => state.posts.replies?.[props?.id]);
 
   const maxLength = 150;
   const userId = auth?.profile?.id;
@@ -91,7 +94,10 @@ function Comment_list(props) {
     try {
       setLoadingReply(true);
       const request = await http.get(`/comments/${props?.id}`);
-      setReplies(request?.data?.replies ?? []);
+
+      dispatch(
+        setCommentReplies({ id: props?.id, replies: request?.data?.replies })
+      );
 
       props.handleReplies(props?.id);
     } catch (error) {
@@ -270,6 +276,7 @@ export function Comment_child({ item }) {
   const maxLength = 150;
 
   const auth = useSelector((state) => state.auth);
+
   const userId = auth?.profile?.id;
 
   const commentText = item?.comment || "";
