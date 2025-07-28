@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 import { setComment } from "@/lib/rtk/features/posts/postSlice";
@@ -11,10 +11,12 @@ import Comment_list from "../list/comment/comment.list";
 
 function Comment_drawer(props) {
   const dispatch = useDispatch();
+  const commentInput = useRef();
   const auth = useSelector((state) => state.auth);
   const posts = useSelector((state) => state.posts);
 
   const [newComment, setNewComment] = React.useState("");
+  const [selectedReplies, setSelectedReplies] = React.useState(null);
   const [isSending, setIsSending] = React.useState(false);
 
   const postId = posts?.current?.id;
@@ -46,15 +48,20 @@ function Comment_drawer(props) {
       upvote: [],
       downvote: [],
       replies: [],
+      comment_parent: selectedReplies?.id ?? null,
     };
 
-    dispatch(setComment([tempComment, ...posts?.comments]));
+    if (!selectedReplies?.id) {
+      dispatch(setComment([tempComment, ...posts?.comments]));
+    }
+
     setNewComment("");
 
     try {
       await http.post("/comments", {
         post_id: postId,
         comment: trimmed,
+        comment_parent: selectedReplies?.id ?? null,
       });
 
       // Optional: replace temp comment with actual from server if ID is important
@@ -121,7 +128,14 @@ function Comment_drawer(props) {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3, type: "spring" }}
               >
-                <Comment_list {...item} />
+                <Comment_list
+                  {...item}
+                  handleReplies={() => {
+                    setNewComment(`@${item?.profile?.username} `);
+                    setSelectedReplies(item);
+                    commentInput.current.focus();
+                  }}
+                />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -129,6 +143,7 @@ function Comment_drawer(props) {
 
         <Box px="15px" py="10px" display="flex" alignItems="center" gap="10px">
           <TextField
+            inputRef={commentInput}
             placeholder="Add Comment"
             variant="outlined"
             size="small"
@@ -136,7 +151,13 @@ function Comment_drawer(props) {
             fullWidth
             sx={{ "& fieldset": { borderRadius: "10px !important" } }}
             value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value?.length === 0) {
+                setSelectedReplies(null);
+              }
+
+              setNewComment(e.target.value);
+            }}
           />
 
           <IconButton

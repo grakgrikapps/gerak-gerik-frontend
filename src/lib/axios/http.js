@@ -9,7 +9,6 @@ const http = axios.create({
 // Add a request interceptor
 http.interceptors.request.use(
   (config) => {
-    console.log("config", Cookies.get("token"));
     config.headers["Authorization"] = "Bearer " + Cookies.get("token");
     return config;
      
