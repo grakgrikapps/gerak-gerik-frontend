@@ -3,7 +3,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 const http = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
+  baseURL: "https://gerak-gerik-backend-production.up.railway.app/v1",
 });
 
 // Add a request interceptor
