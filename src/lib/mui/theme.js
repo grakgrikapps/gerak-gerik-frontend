@@ -91,6 +91,8 @@ const theme = createTheme({
       styleOverrides: {
         containedInherit: {
           backgroundColor: neutral?.[700],
+          color: "#fff",
+          textTransform: "capitalize",
         },
         containedSizeLarge: {
           borderRadius: "10px",
