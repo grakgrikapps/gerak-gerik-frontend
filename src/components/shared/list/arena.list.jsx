@@ -2,6 +2,8 @@ import { Avatar, Chip, Grid, Typography } from "@mui/material";
 import React from "react";
 
 function Arena_list({ photo, name, slug }) {
+  const handleFollow = () => {};
+  
   return (
     <Grid
       container

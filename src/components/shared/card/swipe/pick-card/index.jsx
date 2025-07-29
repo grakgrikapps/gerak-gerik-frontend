@@ -192,7 +192,6 @@ function PickCard({ cardList = [], onEvaluate }) {
                     // muted
                     loop
                     playing={isLastCard}
-                    // light={!isLastCard}
                     light={
                       !isLastCard &&
                       `https://img.youtube.com/vi/${getYouTubeIdFromEmbedUrl(

@@ -16,6 +16,7 @@ const initialState = {
       year: "",
     },
   },
+  myArena: []
 };
 
 // Slice definition
@@ -54,9 +55,19 @@ export const authSlice = createAppSlice({
         password: action.payload.password,
       };
     }),
+    setMyArena: create.reducer((state, action) => {
+      state.myArena = action.payload;
+    }),
   }),
 });
 
 // Action creators
-export const { setToken, setProfile, cleanAuth, setPhone, setBirthdate, setRegister } =
-  authSlice.actions;
+export const {
+  setToken,
+  setProfile,
+  cleanAuth,
+  setPhone,
+  setBirthdate,
+  setRegister,
+  setMyArena,
+} = authSlice.actions;
