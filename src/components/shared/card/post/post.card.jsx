@@ -19,26 +19,67 @@ import ThumbDownIcon from "@/components/shared/icons/hand-thumb-down";
 import ThumbDownOutlineIcon from "@/components/shared/icons/hand-thumb-down-outline";
 import ShareUpIcon from "@/components/shared/icons/share-up";
 import ChatBubleIcon from "@/components/shared/icons/chat-buble";
+import BookmarkOutlineIcon from "@/components/shared/icons/bookmark-outline";
 import BookmarkIcon from "@/components/shared/icons/bookmark";
+import moment from "moment";
+import { getYouTubeIdFromEmbedUrl } from "@/utils/helper";
+import http from "@/lib/axios/http";
 
-function Post_Card() {
+function Post_Card(props) {
   const [isVoting, setIsVoting] = React.useState(false);
   const [loadingReply, setLoadingReply] = React.useState(false);
-  const [upvotes, setUpvotes] = React.useState([]);
-  const [downvotes, setDownvotes] = React.useState([]);
 
   const auth = useSelector((state) => state.auth);
   const userId = auth?.profile?.id;
+
+  const videoId = getYouTubeIdFromEmbedUrl(props?.videos?.[0]?.url);
+
+  const profile = props?.profile;
+
+  const hasBookmark = props?.bookmarks?.find(
+    (item) => item.profile_id === auth?.profile?.id
+  );
+
+  const handleSave = async () => {
+    try {
+      if (hasBookmark) {
+        await http.delete(`/bookmarks/${props?.id}`);
+      } else {
+        await http.get(`/bookmarks/${props?.id}`);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      props.handleRefresh();
+    }
+  };
+
   return (
-    <Grid container justifyContent="space-between" spacing={2}>
+    <Grid container justifyContent="space-between">
       <Grid size={1}>
-        <Avatar />
+        <Avatar src={profile?.photo} />
       </Grid>
-      <Grid size={10.7}>
-        <Typography variant="h5">Pixsellz</Typography>
+      <Grid size={{ lg: 10.5, xs: 10.4 }}>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          mb="4px"
+        >
+          <Box display="flex" alignItems="center" gap="5px">
+            <Typography variant="h5">{profile?.fullname}</Typography>
+            <Typography variant="body2" color="#959595">
+              @{profile?.username}
+            </Typography>
+          </Box>
+
+          <Typography variant="body2" fontSize="10px" color="#959595">
+            {moment(props?.createdAt).fromNow()}
+          </Typography>
+        </Box>
+
         <Typography variant="body1" gutterBottom>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-          eiusmod
+          {props?.description}
         </Typography>
 
         <Box
@@ -49,13 +90,15 @@ function Post_Card() {
           className="player-wrapper"
         >
           <ReactPlayer
-            src="https://www.youtube.com/watch?v=LXb3EKWsInQ"
-            light={`https://img.youtube.com/vi/LXb3EKWsInQ/0.jpg`}
+            src={props?.videos?.[0]?.url}
+            light={`https://img.youtube.com/vi/${videoId}/0.jpg`}
             width="100%"
             height="100%"
             playsInline
             playing
-            controls
+            // onPlay={() => props.setPlayingVideoId(videoId)}
+            // onPause={() => props.setPlayingVideoId(null)}
+            // controls
             // controls={true}
             style={{ borderRadius: "12px", overflow: "hidden" }}
             className="iframe-player"
@@ -91,7 +134,7 @@ function Post_Card() {
                   disabled={isVoting}
                   onClick={() => handleVote("up")}
                 >
-                  {upvotes?.includes(userId) ? (
+                  {props?.upvote?.includes(userId) ? (
                     <ThumbUpIcon size={{ width: "18px", height: "18px" }} />
                   ) : (
                     <ThumbUpOutlineIcon
@@ -106,7 +149,7 @@ function Post_Card() {
               {isVoting ? (
                 <CircularProgress size="12px" color="inherit" />
               ) : (
-                <Typography fontSize="12px">{upvotes?.length}</Typography>
+                <Typography fontSize="12px">{props?.upvote?.length}</Typography>
               )}
             </>
           </Box>
@@ -138,7 +181,7 @@ function Post_Card() {
                   disabled={isVoting}
                   onClick={() => handleVote("down")}
                 >
-                  {downvotes?.includes(userId) ? (
+                  {props?.downvote?.includes(userId) ? (
                     <ThumbDownIcon size={{ width: "18px", height: "18px" }} />
                   ) : (
                     <ThumbDownOutlineIcon
@@ -153,7 +196,9 @@ function Post_Card() {
               {isVoting ? (
                 <CircularProgress size="12px" color="inherit" />
               ) : (
-                <Typography fontSize="12px">{downvotes?.length}</Typography>
+                <Typography fontSize="12px">
+                  {props?.downvote?.length}
+                </Typography>
               )}
             </>
           </Box>
@@ -180,11 +225,7 @@ function Post_Card() {
                   },
                 }}
               >
-                <IconButton
-                  size="small"
-                  disabled={loadingReply}
-                  onClick={() => handleGetReplies()}
-                >
+                <IconButton size="small">
                   <ChatBubleIcon size={{ width: "18px", height: "18px" }} />
                 </IconButton>
               </Tooltip>
@@ -194,7 +235,9 @@ function Post_Card() {
               {loadingReply ? (
                 <CircularProgress size="12px" color="inherit" />
               ) : (
-                <Typography fontSize="12px">0</Typography>
+                <Typography fontSize="12px">
+                  {props?.comments?.length}
+                </Typography>
               )}
             </>
           </Box>
@@ -245,8 +288,14 @@ function Post_Card() {
                 },
               }}
             >
-              <IconButton size="small">
-                <BookmarkIcon size={{ width: "18px", height: "18px" }} />
+              <IconButton size="small" onClick={handleSave}>
+                {hasBookmark ? (
+                  <BookmarkIcon size={{ width: "18px", height: "18px" }} />
+                ) : (
+                  <BookmarkOutlineIcon
+                    size={{ width: "18px", height: "18px" }}
+                  />
+                )}
               </IconButton>
             </Tooltip>
           </motion.div>

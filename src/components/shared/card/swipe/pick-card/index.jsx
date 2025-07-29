@@ -1,6 +1,6 @@
 import React, { use, useCallback, useEffect, useRef, useState } from "react";
 import styles from "./pick-card.module.scss";
-import { clamp } from "@/utils/helper";
+import { clamp, getYouTubeIdFromEmbedUrl } from "@/utils/helper";
 import http from "@/lib/axios/http";
 import ProgressMask from "../progress-mask";
 import { Avatar, Typography } from "@mui/material";
@@ -188,23 +188,16 @@ function PickCard({ cardList = [], onEvaluate }) {
                   <ReactPlayer
                     height="100%"
                     width="100%"
-                    style={
-                      {
-                        // position: "absolute",
-                        // top: "50%",
-                        // left: "50%",
-                        // transform: "translate(-50%, -50%)",
-                        // objectFit: "cover",
-                        // zIndex: 20,
-                        // opacity: 1,
-                      }
-                    }
                     // muted
                     loop
                     playing={isLastCard}
-                    light={!isLastCard}
-                    poster="https://img.youtube.com/vi/6p5yWp0F6Ig/hqdefault.jpg"
-                    src={detail?.videos?.[0]?.url}
+                    // light={!isLastCard}
+                    light={
+                      !isLastCard &&`https://img.youtube.com/vi/${getYouTubeIdFromEmbedUrl(
+                        card?.videos?.[0]?.url ?? ""
+                      )}/0.jpg`
+                    }
+                    src={card?.videos?.[0]?.url}
                   />
                 </div>
 
@@ -222,7 +215,7 @@ function PickCard({ cardList = [], onEvaluate }) {
 
       <Box mt="30px">
         <Grid container justifyContent="space-between">
-          <Grid>
+          <Grid size={1}>
             <Avatar src={detail?.profile?.photo} />
           </Grid>
           <Grid size={10.5}>

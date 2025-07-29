@@ -19,6 +19,15 @@ export const postsSlice = createAppSlice({
     setCurrentPost: create.reducer((state, action) => {
       state.current = action.payload;
     }),
+    setCurrentAddToBookmark: create.reducer((state, action) => {
+      state.current = {
+        ...state.current,
+        bookmarks: [{ profile_id: action.payload }],
+      };
+    }),
+    setCurrentRemoveToBookmark: create.reducer((state) => {
+      state.current = { ...state.current, bookmarks: [] };
+    }),
     setComment: create.reducer((state, action) => {
       state.comments = action.payload;
     }),
@@ -41,4 +50,6 @@ export const {
   setComment,
   setCommentReplies,
   clearCommentReplies,
+  setCurrentAddToBookmark,
+  setCurrentRemoveToBookmark,
 } = postsSlice.actions;

@@ -16,6 +16,7 @@ import http from "@/lib/axios/http";
 import { useRouter } from "next/navigation";
 import { setProfile } from "@/lib/rtk/features/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { motion, AnimatePresence } from "framer-motion";
 
 function a11yProps(index) {
   return {
@@ -30,9 +31,31 @@ function Profile_Page() {
   const profile = useSelector((state) => state.auth.profile);
 
   const [value, setValue] = React.useState(0);
+  const [postLists, setPostLists] = React.useState([]);
+  const [playingVideoId, setPlayingVideoId] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+  };
+
+  const handleRefresh = () => {
+    setLoading(true);
+    const url =
+      value === 0 ? "/auth/profile/posts" : "/auth/profile/posts/bookmarks";
+
+    http
+      .get(url)
+      .then((res) => setPostLists(res.data))
+      .finally(() => setLoading(false));
+  };
+
+  const getEmptyTitle = () => {
+    if (value === 0) {
+      return "No posts yet";
+    } else if (value === 1) {
+      return "No bookmarks yet";
+    }
   };
 
   React.useEffect(() => {
@@ -40,6 +63,10 @@ function Profile_Page() {
       .get("/auth/profile")
       .then((res) => dispatch(setProfile(res.data?.profile)));
   }, []);
+
+  React.useEffect(() => {
+    handleRefresh();
+  }, [value]);
 
   return (
     <>
@@ -161,7 +188,7 @@ function Profile_Page() {
                     }}
                     {...a11yProps(0)}
                   />
-                  <Tab label="Replies" {...a11yProps(1)} />
+                  {/* <Tab label="Replies" {...a11yProps(1)} /> */}
                   <Tab label="Bookmarks" {...a11yProps(2)} />
                 </Tabs>
               </Box>
@@ -173,8 +200,44 @@ function Profile_Page() {
       {/* Content */}
       <Container>
         <Box mb="20px" display="flex" flexDirection="column" gap="30px">
-          {[...new Array(10)].map((item, key) => (
-            <Card_Post key={key} />
+          {postLists.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            >
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                py={6}
+                sx={{ opacity: 0.6 }}
+              >
+                <Typography variant="h4" fontWeight={500}>
+                  {getEmptyTitle()}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Be the first to start the conversation!
+                </Typography>
+              </Box>
+            </motion.div>
+          )}
+
+          {postLists.map((item, key) => (
+            <motion.div
+              key={key}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: key * 0.05 }}
+            >
+              <Card_Post
+                {...item}
+                playingVideoId={playingVideoId}
+                setPlayingVideoId={setPlayingVideoId}
+                handleRefresh={handleRefresh}
+              />
+            </motion.div>
           ))}
         </Box>
       </Container>

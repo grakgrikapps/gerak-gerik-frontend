@@ -50,3 +50,8 @@ a {
 .MuiInputBase-root::before {
   border-color: #3C3C434A !important;
 }
+
+.ytp-watermark {
+  display: none !important;
+  visibility: hidden !important;
+}
