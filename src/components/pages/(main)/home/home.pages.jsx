@@ -11,7 +11,7 @@ import http from "@/lib/axios/http";
 
 function Home_pages() {
   const dispatch = useDispatch();
-  const [cardList, setCardList] = React.useState(CARD_LIST);
+  const [cardList, setCardList] = React.useState([]);
   //   const progress = 1 - cardList.length / CARD_LIST.length;
 
   React.useEffect(() => {

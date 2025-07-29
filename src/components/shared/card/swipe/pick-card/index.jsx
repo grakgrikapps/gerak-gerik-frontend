@@ -146,11 +146,18 @@ function PickCard({ cardList = [], onEvaluate }) {
   }, []);
 
   useEffect(() => {
-    if (cardList?.[0]?.id)
-      http.get(`/posts/${cardList?.[0]?.id}`).then((res) => {
+    if (cardList?.[0]?.id) {
+      setActiveIndex(cardList?.length - 1);
+    }
+  }, [cardList]);
+
+  useEffect(() => {
+    if (activeIndex >= 0) {
+      http.get(`/posts/${cardList[activeIndex]?.id}`).then((res) => {
         setDetail(res?.data);
       });
-  }, [cardList]);
+    }
+  }, [activeIndex]);
 
   return (
     <>
@@ -186,8 +193,10 @@ function PickCard({ cardList = [], onEvaluate }) {
                       zIndex: 20,
                       opacity: 1,
                     }}
-                    playing={isActiveCard}
-                    src="https://www.youtube.com/watch?v=LXb3EKWsInQ"
+                    muted
+                    playing={isLastCard}
+                    light={!isLastCard}
+                    src={detail?.videos?.[0]?.url}
                   />
                 </div>
 
@@ -214,7 +223,7 @@ function PickCard({ cardList = [], onEvaluate }) {
               justifyContent="space-between"
               alignItems="center"
             >
-              <Box display="flex" alignItems="center">
+              <Box display="flex" alignItems="center" gap="5px">
                 <Typography variant="h5">
                   {detail?.profile?.fullname}
                 </Typography>
@@ -232,26 +241,6 @@ function PickCard({ cardList = [], onEvaluate }) {
           </Grid>
         </Grid>
       </Box>
-
-      {/* {activeIndex >= 0 && (
-        <div className={styles.button_wrap}>
-          <button
-            type="button"
-            className={styles.bad_button}
-            onClick={() => handleEvaluate("bad")}
-          >
-            <img src={"/thumb-down.svg"} alt="bad" />
-          </button>
-
-          <button
-            type="button"
-            className={styles.good_button}
-            onClick={() => handleEvaluate("good")}
-          >
-            <img src={"/thumb-up.svg"} alt="good" />
-          </button>
-        </div>
-      )} */}
     </>
   );
 }
