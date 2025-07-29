@@ -25,12 +25,12 @@ function a11yProps(index) {
   };
 }
 
-function Profile_Page() {
+function Profile_Detail_Page() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const profile = useSelector((state) => state.auth.profile);
 
   const [value, setValue] = React.useState(0);
+  const [profile, setProfile] = React.useState(null);
   const [postLists, setPostLists] = React.useState([]);
   const [playingVideoId, setPlayingVideoId] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
@@ -42,13 +42,17 @@ function Profile_Page() {
   const handleRefresh = () => {
     setLoading(true);
     const url =
-      value === 0 ? "/auth/profile/posts" : "/auth/profile/posts/bookmarks";
+      value === 0
+        ? `/auth/profile/posts?profile_id=${profile?.id}`
+        : `/auth/profile/posts/bookmarks?profile_id=${profile?.id}`;
 
     http
       .get(url)
       .then((res) => setPostLists(res.data))
       .finally(() => setLoading(false));
   };
+
+  const handleFollow = () => {};
 
   const getEmptyTitle = () => {
     if (value === 0) {
@@ -59,14 +63,12 @@ function Profile_Page() {
   };
 
   React.useEffect(() => {
-    http
-      .get("/auth/profile")
-      .then((res) => dispatch(setProfile(res.data?.profile)));
+    http.get("/auth/profile").then((res) => setProfile(res.data?.profile));
   }, []);
 
   React.useEffect(() => {
-    handleRefresh();
-  }, [value]);
+    if (profile) handleRefresh();
+  }, [value, profile]);
 
   return (
     <>
@@ -112,13 +114,13 @@ function Profile_Page() {
                 src={profile?.photo}
               />
 
-              {/* <Chip
-                label="Edit Profile"
+              <Chip
+                label="Follow"
                 variant="outlined"
                 size="small"
                 sx={{ borderRadius: "4px", border: "1px solid #000000" }}
-                onClick={() => router.push("/profile/edit")}
-              /> */}
+                onClick={() => handleFollow()}
+              />
             </Box>
 
             {/* Content */}
@@ -245,4 +247,4 @@ function Profile_Page() {
   );
 }
 
-export default Profile_Page;
+export default Profile_Detail_Page;

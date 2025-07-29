@@ -9,6 +9,7 @@ import ReactPlayer from "react-player";
 import { useDispatch } from "react-redux";
 import { setCurrentPost } from "@/lib/rtk/features/posts/postSlice";
 import moment from "moment";
+import Link from "next/link";
 
 // Fungsi untuk mendapatkan posisi dari mouse/touch
 const getPosition = (event) => {
@@ -193,7 +194,8 @@ function PickCard({ cardList = [], onEvaluate }) {
                     playing={isLastCard}
                     // light={!isLastCard}
                     light={
-                      !isLastCard &&`https://img.youtube.com/vi/${getYouTubeIdFromEmbedUrl(
+                      !isLastCard &&
+                      `https://img.youtube.com/vi/${getYouTubeIdFromEmbedUrl(
                         card?.videos?.[0]?.url ?? ""
                       )}/0.jpg`
                     }
@@ -216,7 +218,9 @@ function PickCard({ cardList = [], onEvaluate }) {
       <Box mt="30px">
         <Grid container justifyContent="space-between">
           <Grid size={1}>
-            <Avatar src={detail?.profile?.photo} />
+            <Link href={`/profile/${detail?.profile?.username}`}>
+              <Avatar src={detail?.profile?.photo} />
+            </Link>
           </Grid>
           <Grid size={10.5}>
             <Box
