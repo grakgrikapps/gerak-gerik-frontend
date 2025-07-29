@@ -6,6 +6,8 @@ import ProgressMask from "../progress-mask";
 import { Avatar, Typography } from "@mui/material";
 import { Box, Grid } from "@mui/system";
 import ReactPlayer from "react-player";
+import { useDispatch } from "react-redux";
+import { setCurrentPost } from "@/lib/rtk/features/posts/postSlice";
 import moment from "moment";
 
 // Fungsi untuk mendapatkan posisi dari mouse/touch
@@ -19,6 +21,7 @@ const getPosition = (event) => {
 
 function PickCard({ cardList = [], onEvaluate }) {
   const interactionRef = useRef();
+  const dispatch = useDispatch();
   const [isInteracting, setIsInteracting] = useState(false);
   const [activeIndex, setActiveIndex] = useState(cardList.length - 1);
   const [progress, setProgress] = useState(0); // animation progress (-1 ~ 1)
@@ -155,6 +158,7 @@ function PickCard({ cardList = [], onEvaluate }) {
     if (activeIndex >= 0) {
       http.get(`/posts/${cardList[activeIndex]?.id}`).then((res) => {
         setDetail(res?.data);
+        dispatch(setCurrentPost(res?.data));
       });
     }
   }, [activeIndex]);
@@ -182,20 +186,24 @@ function PickCard({ cardList = [], onEvaluate }) {
               <div className={styles.card_inner}>
                 <div className={styles.image_wrap}>
                   <ReactPlayer
-                    height={(calcWidth / 16) * 9}
-                    width={calcWidth}
-                    style={{
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      objectFit: "cover",
-                      zIndex: 20,
-                      opacity: 1,
-                    }}
-                    muted
+                    height="100%"
+                    width="100%"
+                    style={
+                      {
+                        // position: "absolute",
+                        // top: "50%",
+                        // left: "50%",
+                        // transform: "translate(-50%, -50%)",
+                        // objectFit: "cover",
+                        // zIndex: 20,
+                        // opacity: 1,
+                      }
+                    }
+                    // muted
+                    loop
                     playing={isLastCard}
                     light={!isLastCard}
+                    poster="https://img.youtube.com/vi/6p5yWp0F6Ig/hqdefault.jpg"
                     src={detail?.videos?.[0]?.url}
                   />
                 </div>

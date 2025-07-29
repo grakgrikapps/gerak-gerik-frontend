@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import styles from "@/styles/App.module.scss";
-import { CARD_LIST } from "@/utils/helper";
 import { useDispatch } from "react-redux";
 import { setCurrentPost } from "@/lib/rtk/features/posts/postSlice";
 

@@ -61,7 +61,10 @@ function Post_create_pages() {
     validationSchema: validationSchema,
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       try {
-        const request = await http.post("/posts", values);
+        const request = await http.post("/posts", {
+          ...values,
+          description: values.caption,
+        });
         await http.post("/videos", {
           post_id: request?.data?.id,
           title: "",
@@ -157,7 +160,7 @@ function Post_create_pages() {
               overflow: "hidden",
               marginBottom: "15px",
               height: "300px",
-              minHeight: '300px'
+              minHeight: "300px",
             }}
             src={normalizedUrl}
             muted

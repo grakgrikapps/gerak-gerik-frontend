@@ -173,6 +173,24 @@ function Comment_drawer(props) {
           }}
         >
           <AnimatePresence mode="popLayout" initial={false}>
+            {posts?.comments.length === 0 && (
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                py={6}
+                sx={{ opacity: 0.6 }}
+              >
+                <Typography variant="h4" fontWeight={500}>
+                  No comments yet
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Be the first to start the discussion.
+                </Typography>
+              </Box>
+            )}
+
             {posts?.comments?.map((item, key) => (
               <motion.div
                 key={item.id}
@@ -227,7 +245,6 @@ function Comment_drawer(props) {
             }}
             onBlur={formik.handleBlur}
             error={formik.touched.comment && Boolean(formik.errors.comment)}
-            helperText={formik.touched.comment && formik.errors.comment}
           />
 
           <IconButton

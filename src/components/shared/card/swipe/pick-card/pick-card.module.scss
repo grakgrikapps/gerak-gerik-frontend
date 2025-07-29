@@ -13,7 +13,7 @@
   // height: 100%;
   // margin: 0 auto;
   touch-action: none;
-  margin-top: -8dvh;
+  margin-top: -7dvh;
 }
 
 .card_inner {
@@ -22,7 +22,7 @@
   overflow: hidden;
   height: 100%;
   border-radius: 10px;
-  background-color: #fff;
+  background-color: #bebebe;
   pointer-events: none;
   transform: translateY(20px) scale(0.97);
   transition: box-shadow 0.3s, transform 0.3s;
