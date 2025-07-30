@@ -59,28 +59,29 @@ function Top_bar() {
             sx={{ "&::-webkit-scrollbar": { display: "none" } }}
           >
             {React.Children.toArray(
-              ["For You", ...myArena.map((item) => item?.arena?.name)].map(
-                (item) => (
-                  <Button
-                    key={item}
-                    size="small"
-                    color="inherit"
-                    onClick={() => dispatch(setCurrentArena(item))}
-                    sx={{
-                      fontWeight: item === arena.current ? 700 : 400,
-                      borderBottom:
-                        item === arena.current ? "2px solid #000000" : "none",
-                      borderRadius: 0,
-                      minHeight: "0px",
-                      minWidth: "fit-content",
-                      fontSize: "14px",
-                      textTransform: "capitalize",
-                    }}
-                  >
-                    {item}
-                  </Button>
-                )
-              )
+              [
+                "For You",
+                ...(myArena ?? []).map((item) => item?.arena?.name),
+              ].map((item) => (
+                <Button
+                  key={item}
+                  size="small"
+                  color="inherit"
+                  onClick={() => dispatch(setCurrentArena(item))}
+                  sx={{
+                    fontWeight: item === arena.current ? 700 : 400,
+                    borderBottom:
+                      item === arena.current ? "2px solid #000000" : "none",
+                    borderRadius: 0,
+                    minHeight: "0px",
+                    minWidth: "fit-content",
+                    fontSize: "14px",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {item}
+                </Button>
+              ))
             )}
           </Box>
         </Box>

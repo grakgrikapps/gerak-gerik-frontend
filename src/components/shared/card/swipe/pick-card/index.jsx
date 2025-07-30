@@ -28,6 +28,8 @@ function PickCard({ cardList = [], onEvaluate }) {
   const [progress, setProgress] = useState(0); // animation progress (-1 ~ 1)
   const [calcWidth, setCalcWidth] = useState(0);
   const [detail, setDetail] = useState({});
+  const [isPaused, setIsPaused] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const handleStart = useCallback((e) => {
     document.body.classList.add(styles.fix_container);
@@ -94,6 +96,7 @@ function PickCard({ cardList = [], onEvaluate }) {
 
     if (isSelect) {
       setActiveIndex((prev) => prev - 1);
+      setIsPaused(false);
     }
 
     setTimeout(() => {
@@ -183,7 +186,15 @@ function PickCard({ cardList = [], onEvaluate }) {
                 onTouchStart: handleStart,
                 onMouseDown: handleStart,
               })}
+              onClick={() => {
+                if (isPlaying) {
+                  setIsPaused(true);
+                } else {
+                  setIsPaused(false);
+                }
+              }}
             >
+              {console.log("setIsPaused", isPaused)}
               <div className={styles.card_inner}>
                 <div className={styles.image_wrap}>
                   <ReactPlayer
@@ -191,7 +202,13 @@ function PickCard({ cardList = [], onEvaluate }) {
                     width="100%"
                     // muted
                     loop
-                    playing={isLastCard}
+                    playing={isLastCard && !isPaused}
+                    onPlaying={() =>
+                      setTimeout(() => {
+                        setIsPlaying(true);
+                      }, 500)
+                    }
+                    onPause={() => setIsPlaying(false)}
                     light={
                       !isLastCard &&
                       `https://img.youtube.com/vi/${getYouTubeIdFromEmbedUrl(
