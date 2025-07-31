@@ -3,7 +3,7 @@ import styles from "./pick-card.module.scss";
 import { clamp, getYouTubeIdFromEmbedUrl } from "@/utils/helper";
 import http from "@/lib/axios/http";
 import ProgressMask from "../progress-mask";
-import { Avatar, Typography } from "@mui/material";
+import { Avatar, Typography, LinearProgress } from "@mui/material";
 import { Box, Grid } from "@mui/system";
 import ReactPlayer from "react-player";
 import { useDispatch } from "react-redux";
@@ -167,10 +167,87 @@ function PickCard({ cardList = [], onEvaluate }) {
     }
   }, [activeIndex]);
 
+  const value = 80;
+
   return (
     <>
       <div className={styles.container}>
         {/* <PickCardResult /> */}
+
+        {/* Left vertical progress */}
+        <Box
+          sx={{
+            position: "absolute",
+            left: "0px",
+            top: "30px",
+            height: "calc(100dvh - 350px)",
+            display: "flex",
+            alignItems: "flex-start",
+            zIndex: 110,
+          }}
+        >
+          <Box sx={{ position: "relative", width: "8px" }}>
+            {/* Background bar */}
+            <Box
+              sx={{
+                width: "8px",
+                height: "calc(100dvh - 350px)",
+                // backgroundColor: "#e0e0e0",
+                borderRadius: "8px",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              {/* Progress fill */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: 0,
+                  width: "100%",
+                  height: `${value}%`,
+                  backgroundImage: "linear-gradient(to top, #D00D3F, #94001B)",
+                  borderRadius: "8px",
+                  transition: "height 0.3s ease-in-out",
+                }}
+              />
+            </Box>
+
+            {/* Label */}
+            <Typography
+              sx={{
+                position: "absolute",
+                top: `${value}%`,
+                left: "12px",
+                color: "#fff",
+                fontSize: "10px",
+              }}
+            >
+              {value}%
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Right vertical progress */}
+        <LinearProgress
+          variant="determinate"
+          value={100}
+          // value={isLastCard ? (1 - progress) * 50 : 0}
+          sx={{
+            position: "absolute",
+            right: "0px",
+            top: "30px",
+            height: "calc(100dvh - 350px)",
+            width: "8px",
+            borderRadius: "8px",
+            backgroundColor: "#e0e0e0",
+            transform: "none",
+            zIndex: 100,
+            "& .MuiLinearProgress-bar": {
+              backgroundImage: "linear-gradient(to bottom, #4177FC, #2D67F6)",
+              borderRadius: "8px",
+            },
+          }}
+        />
 
         {cardList.map((card, index) => {
           const isActiveCard = index >= activeIndex;
@@ -194,7 +271,6 @@ function PickCard({ cardList = [], onEvaluate }) {
                 }
               }}
             >
-              {console.log("setIsPaused", isPaused)}
               <div className={styles.card_inner}>
                 <div className={styles.image_wrap}>
                   <ReactPlayer

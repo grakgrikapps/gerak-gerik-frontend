@@ -13,8 +13,7 @@ import {
 import ChevronLeftIcon from "@/components/shared/icons/chevron-left";
 import Card_Post from "@/components/shared/card/post/post.card";
 import http from "@/lib/axios/http";
-import { useRouter } from "next/navigation";
-import { setProfile } from "@/lib/rtk/features/auth/authSlice";
+import { useParams, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -27,7 +26,7 @@ function a11yProps(index) {
 
 function Profile_Detail_Page() {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const { id } = useParams();
 
   const [value, setValue] = React.useState(0);
   const [profile, setProfile] = React.useState(null);
@@ -63,7 +62,9 @@ function Profile_Detail_Page() {
   };
 
   React.useEffect(() => {
-    http.get("/auth/profile").then((res) => setProfile(res.data?.profile));
+    http
+      .get(`/auth/profile/detail/${id}`)
+      .then((res) => setProfile(res.data?.[0]?.profile));
   }, []);
 
   React.useEffect(() => {

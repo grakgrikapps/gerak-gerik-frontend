@@ -2,7 +2,14 @@
 
 import React from "react";
 import SearchIcon from "../icons/search";
-import { Avatar, Box, Container, Button, IconButton } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Container,
+  Button,
+  IconButton,
+  Grid,
+} from "@mui/material";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { setMyArena } from "@/lib/rtk/features/auth/authSlice";
@@ -22,73 +29,65 @@ function Top_bar() {
   }, []);
 
   return (
-    <Box
-      display="flex"
-      alignItems="center"
-      justifyContent="space-between"
-      py="10px"
-    >
-      <Container
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "10px",
-        }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "10px",
-          }}
+    <Box>
+      <Container>
+        <Grid
+          container
+          width="100%"
+          justifyContent="space-between"
+          alignItems="center"
         >
-          <Link href="/profile">
+          <Grid>
+            <Link href="/profile">
+              <IconButton size="small">
+                <Avatar sizes="small" src={profile?.photo ?? null} />
+              </IconButton>
+            </Link>
+          </Grid>
+
+          <Grid size={{ xs: 9 }}>
+            <Box
+              mt={0.5}
+              gap={2}
+              display="flex"
+              overflow="auto"
+              justifyContent="space-between"
+              sx={{ "&::-webkit-scrollbar": { display: "none" } }}
+            >
+              {React.Children.toArray(
+                [
+                  "For You",
+                  ...(myArena ?? []).map((item) => item?.arena?.name),
+                ].map((item) => (
+                  <Button
+                    key={item}
+                    size="small"
+                    color="inherit"
+                    onClick={() => dispatch(setCurrentArena(item))}
+                    sx={{
+                      fontWeight: item === arena.current ? 700 : 400,
+                      borderBottom:
+                        item === arena.current ? "2px solid #000000" : "none",
+                      borderRadius: 0,
+                      minHeight: "0px",
+                      minWidth: "fit-content",
+                      fontSize: "14px",
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {item}
+                  </Button>
+                ))
+              )}
+            </Box>
+          </Grid>
+
+          <Grid size={{ xs: 1 }}>
             <IconButton size="small">
-              <Avatar sizes="small" src={profile?.photo ?? null} />
+              <SearchIcon color="#999DA3" />
             </IconButton>
-          </Link>
-
-          <Box
-            mt={0.5}
-            gap={2}
-            display="flex"
-            overflow="auto"
-            justifyContent="space-between"
-            sx={{ "&::-webkit-scrollbar": { display: "none" } }}
-          >
-            {React.Children.toArray(
-              [
-                "For You",
-                ...(myArena ?? []).map((item) => item?.arena?.name),
-              ].map((item) => (
-                <Button
-                  key={item}
-                  size="small"
-                  color="inherit"
-                  onClick={() => dispatch(setCurrentArena(item))}
-                  sx={{
-                    fontWeight: item === arena.current ? 700 : 400,
-                    borderBottom:
-                      item === arena.current ? "2px solid #000000" : "none",
-                    borderRadius: 0,
-                    minHeight: "0px",
-                    minWidth: "fit-content",
-                    fontSize: "14px",
-                    textTransform: "capitalize",
-                  }}
-                >
-                  {item}
-                </Button>
-              ))
-            )}
-          </Box>
-        </Box>
-
-        <IconButton size="small">
-          <SearchIcon color="#999DA3" />
-        </IconButton>
+          </Grid>
+        </Grid>
       </Container>
     </Box>
   );
