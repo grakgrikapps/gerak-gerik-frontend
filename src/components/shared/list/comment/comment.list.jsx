@@ -20,6 +20,7 @@ import ThumbUpOutlineIcon from "@/components/shared/icons/hand-thumb-up-outline"
 import ThumbDownIcon from "@/components/shared/icons/hand-thumb-down";
 import ThumbDownOutlineIcon from "@/components/shared/icons/hand-thumb-down-outline";
 import ChatBubleIcon from "@/components/shared/icons/chat-buble";
+import Link from "next/link";
 
 function formatCommentText(text) {
   const regex = /@(\w+)/g;
@@ -110,11 +111,13 @@ function Comment_list(props) {
   return (
     <Grid container justifyContent="space-between" mb="10px">
       <Grid>
-        <Avatar
-          sizes="small"
-          alt={props?.profile?.fullname}
-          src={props?.profile?.photo}
-        />
+        <Link href={`/profile/${props?.profile?.username}`}>
+          <Avatar
+            sizes="small"
+            alt={props?.profile?.fullname}
+            src={props?.profile?.photo}
+          />
+        </Link>
       </Grid>
       <Grid size={10.7}>
         {/* Comment Head */}

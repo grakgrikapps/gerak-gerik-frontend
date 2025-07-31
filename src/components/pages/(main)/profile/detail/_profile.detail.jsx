@@ -27,31 +27,47 @@ function a11yProps(index) {
 function Profile_Detail_Page() {
   const router = useRouter();
   const { id } = useParams();
+  const auth = useSelector((state) => state.auth);
 
   const [value, setValue] = React.useState(0);
   const [profile, setProfile] = React.useState(null);
   const [postLists, setPostLists] = React.useState([]);
   const [playingVideoId, setPlayingVideoId] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
+
+  const hasFollow = profile?.followers?.find(
+    (item) => item.profile_id === auth?.profile?.id
+  );
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
   const handleRefresh = () => {
-    setLoading(true);
     const url =
       value === 0
         ? `/auth/profile/posts?profile_id=${profile?.id}`
         : `/auth/profile/posts/bookmarks?profile_id=${profile?.id}`;
 
-    http
-      .get(url)
-      .then((res) => setPostLists(res.data))
-      .finally(() => setLoading(false));
+    http.get(url).then((res) => setPostLists(res.data));
   };
 
-  const handleFollow = () => {};
+  const handleFollow = async () => {
+    if (hasFollow) {
+      await http.get(`/auth/profile/${profile?.id}/unfollow`);
+      setProfile((prev) => ({
+        ...prev,
+        followers: prev.followers.filter(
+          (item) => item.profile_id !== auth?.profile?.id
+        ),
+      }));
+    } else {
+      await http.get(`/auth/profile/${profile?.id}/follow`);
+      setProfile((prev) => ({
+        ...prev,
+        followers: [...prev.followers, { profile_id: auth?.profile?.id }],
+      }));
+    }
+  };
 
   const getEmptyTitle = () => {
     if (value === 0) {
@@ -116,10 +132,11 @@ function Profile_Detail_Page() {
               />
 
               <Chip
-                label="Follow"
-                variant="outlined"
+                label={hasFollow ? "Unfollow" : "Follow"}
+                variant={hasFollow ? "contained" : "outlined"}
                 size="small"
-                sx={{ borderRadius: "4px", border: "1px solid #000000" }}
+                color="primary"
+                sx={{ borderRadius: "4px" }}
                 onClick={() => handleFollow()}
               />
             </Box>

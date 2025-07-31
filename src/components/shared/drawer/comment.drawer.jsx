@@ -5,6 +5,7 @@ import {
   setComment,
   setCommentReplies,
   clearCommentReplies,
+  setPauseVideo,
 } from "@/lib/rtk/features/posts/postSlice";
 import { Box, Typography, TextField, IconButton } from "@mui/material";
 import { useFormik } from "formik";
@@ -121,6 +122,7 @@ function Comment_drawer(props) {
 
   React.useEffect(() => {
     if (props.open) {
+      dispatch(setPauseVideo(true));
       http.get(`/comments?post_id=${postId}`).then((res) => {
         dispatch(setComment(res?.data ?? []));
         dispatch(clearCommentReplies()); // clear replies

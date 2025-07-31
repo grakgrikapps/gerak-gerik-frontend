@@ -3,11 +3,15 @@ import styles from "./pick-card.module.scss";
 import { clamp, getYouTubeIdFromEmbedUrl } from "@/utils/helper";
 import http from "@/lib/axios/http";
 import ProgressMask from "../progress-mask";
-import { Avatar, Typography, LinearProgress } from "@mui/material";
+import { Avatar, Typography } from "@mui/material";
 import { Box, Grid } from "@mui/system";
 import ReactPlayer from "react-player";
 import { useDispatch } from "react-redux";
-import { setCurrentPost } from "@/lib/rtk/features/posts/postSlice";
+import {
+  setCurrentPost,
+  setPauseVideo,
+} from "@/lib/rtk/features/posts/postSlice";
+import { useSelector } from "react-redux";
 import moment from "moment";
 import Link from "next/link";
 
@@ -28,8 +32,9 @@ function PickCard({ cardList = [], onEvaluate }) {
   const [progress, setProgress] = useState(0); // animation progress (-1 ~ 1)
   const [calcWidth, setCalcWidth] = useState(0);
   const [detail, setDetail] = useState({});
-  const [isPaused, setIsPaused] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const posts = useSelector((state) => state.posts);
 
   const handleStart = useCallback((e) => {
     document.body.classList.add(styles.fix_container);
@@ -96,15 +101,21 @@ function PickCard({ cardList = [], onEvaluate }) {
 
     if (isSelect) {
       setActiveIndex((prev) => prev - 1);
-      setIsPaused(false);
+      dispatch(setPauseVideo(false));
     }
 
-    setTimeout(() => {
+    setTimeout(async () => {
       document.body.classList.remove(styles.fix_container);
 
       if (isSelect) {
         const selectedCard = cardList[cardList.length - 1];
         onEvaluate?.(selectedCard, isGood ? "good" : "bad");
+
+        if (isGood) {
+          await http.get(`/posts/upvote/${selectedCard?.id}`);
+        } else {
+          await http.get(`/posts/downvote/${selectedCard?.id}`);
+        }
       }
     }, 300);
   }, [cardList, onEvaluate, progress]);
@@ -167,87 +178,130 @@ function PickCard({ cardList = [], onEvaluate }) {
     }
   }, [activeIndex]);
 
-  const value = 80;
+  const upvotes = detail?.upvote?.length ?? 0;
+  const downvotes = detail?.downvote?.length ?? 0;
+  const totalVotes = upvotes + downvotes;
+
+  const upvotePercentage = totalVotes > 0 ? (upvotes / totalVotes) * 100 : 0;
+  const downvotePercentage = 100 - upvotePercentage;
+
+  console.log("posts?.pause", posts?.pause);
 
   return (
     <>
       <div className={styles.container}>
         {/* <PickCardResult /> */}
 
-        {/* Left vertical progress */}
-        <Box
-          sx={{
-            position: "absolute",
-            left: "0px",
-            top: "30px",
-            height: "calc(100dvh - 350px)",
-            display: "flex",
-            alignItems: "flex-start",
-            zIndex: 110,
-          }}
-        >
-          <Box sx={{ position: "relative", width: "8px" }}>
-            {/* Background bar */}
+        {totalVotes > 0 && (
+          <>
+            {/* Left vertical progress */}
             <Box
               sx={{
-                width: "8px",
+                position: "absolute",
+                left: "0px",
+                top: "30px",
                 height: "calc(100dvh - 350px)",
-                // backgroundColor: "#e0e0e0",
-                borderRadius: "8px",
-                position: "relative",
-                overflow: "hidden",
+                display: isInteracting ? "none" : "flex",
+                alignItems: "flex-start",
+                zIndex: 110,
               }}
             >
-              {/* Progress fill */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  bottom: 0,
-                  width: "100%",
-                  height: `${value}%`,
-                  backgroundImage: "linear-gradient(to top, #D00D3F, #94001B)",
-                  borderRadius: "8px",
-                  transition: "height 0.3s ease-in-out",
-                }}
-              />
+              <Box sx={{ position: "relative", width: "8px" }}>
+                {/* Background bar */}
+                <Box
+                  sx={{
+                    width: "8px",
+                    height: "calc(100dvh - 350px)",
+                    // backgroundColor: "#e0e0e0",
+                    borderRadius: "8px",
+                    position: "relative",
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* Progress fill */}
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      bottom: 0,
+                      width: "100%",
+                      height: `${downvotePercentage}%`,
+                      backgroundImage:
+                        "linear-gradient(to top, #D00D3F, #94001B)",
+                      borderRadius: "8px",
+                      transition: "height 0.3s ease-in-out",
+                    }}
+                  />
+                </Box>
+
+                {/* Label */}
+                <Typography
+                  sx={{
+                    position: "absolute",
+                    top: `${100 - downvotePercentage}%`,
+                    left: "12px",
+                    color: "#fff",
+                    fontSize: "10px",
+                  }}
+                >
+                  {Math.round(downvotePercentage)}%
+                </Typography>
+              </Box>
             </Box>
 
-            {/* Label */}
-            <Typography
+            {/* Right vertical progress */}
+            <Box
               sx={{
                 position: "absolute",
-                top: `${value}%`,
-                left: "12px",
-                color: "#fff",
-                fontSize: "10px",
+                right: "0px",
+                top: "30px",
+                height: "calc(100dvh - 350px)",
+                display: isInteracting ? "none" : "flex",
+                alignItems: "flex-end",
+                zIndex: 110,
               }}
             >
-              {value}%
-            </Typography>
-          </Box>
-        </Box>
+              <Box sx={{ position: "relative", width: "8px" }}>
+                {/* Background bar */}
+                <Box
+                  sx={{
+                    width: "8px",
+                    height: "calc(100dvh - 350px)",
+                    borderRadius: "8px",
+                    position: "relative",
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* Progress fill */}
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      bottom: 0,
+                      width: "100%",
+                      height: `${upvotePercentage}%`,
+                      backgroundImage:
+                        "linear-gradient(to top, #4177FC, #2D67F6)",
+                      borderRadius: "8px",
+                      transition: "height 0.3s ease-in-out",
+                    }}
+                  />
+                </Box>
 
-        {/* Right vertical progress */}
-        <LinearProgress
-          variant="determinate"
-          value={100}
-          // value={isLastCard ? (1 - progress) * 50 : 0}
-          sx={{
-            position: "absolute",
-            right: "0px",
-            top: "30px",
-            height: "calc(100dvh - 350px)",
-            width: "8px",
-            borderRadius: "8px",
-            backgroundColor: "#e0e0e0",
-            transform: "none",
-            zIndex: 100,
-            "& .MuiLinearProgress-bar": {
-              backgroundImage: "linear-gradient(to bottom, #4177FC, #2D67F6)",
-              borderRadius: "8px",
-            },
-          }}
-        />
+                {/* Label */}
+                <Typography
+                  sx={{
+                    position: "absolute",
+                    top: `${100 - upvotePercentage}%`,
+                    right: "12px",
+                    color: "#fff",
+                    fontSize: "10px",
+                  }}
+                >
+                  {Math.round(upvotePercentage)}%
+                </Typography>
+              </Box>
+            </Box>
+          </>
+        )}
 
         {cardList.map((card, index) => {
           const isActiveCard = index >= activeIndex;
@@ -265,9 +319,9 @@ function PickCard({ cardList = [], onEvaluate }) {
               })}
               onClick={() => {
                 if (isPlaying) {
-                  setIsPaused(true);
+                  dispatch(setPauseVideo(true));
                 } else {
-                  setIsPaused(false);
+                  dispatch(setPauseVideo(false));
                 }
               }}
             >
@@ -278,11 +332,11 @@ function PickCard({ cardList = [], onEvaluate }) {
                     width="100%"
                     // muted
                     loop
-                    playing={isLastCard && !isPaused}
+                    playing={isLastCard && !posts?.pause}
                     onPlaying={() =>
                       setTimeout(() => {
                         setIsPlaying(true);
-                      }, 500)
+                      }, 100)
                     }
                     onPause={() => setIsPlaying(false)}
                     light={

@@ -6,6 +6,8 @@ const initialState = {
   current: null,
   comments: [],
   replies: {},
+  pause: false,
+  playing: false,
 };
 
 // Slice definition
@@ -18,6 +20,12 @@ export const postsSlice = createAppSlice({
     }),
     setCurrentPost: create.reducer((state, action) => {
       state.current = action.payload;
+    }),
+    setPauseVideo: create.reducer((state, action) => {
+      state.pause = action.payload;
+    }),
+    setPlayVideo: create.reducer((state, action) => {
+      state.playing = action.payload;
     }),
     setCurrentAddToBookmark: create.reducer((state, action) => {
       state.current = {
@@ -52,4 +60,6 @@ export const {
   clearCommentReplies,
   setCurrentAddToBookmark,
   setCurrentRemoveToBookmark,
+  setPauseVideo,
+  setPlayVideo,
 } = postsSlice.actions;
