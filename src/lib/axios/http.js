@@ -27,7 +27,7 @@ http.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       // Tangani error 401 di sini, misalnya, redirect atau tampilkan pesan
-    //   if (window) window.location.replace("/logout");
+      if (window) window.location.replace("/logout");
     }
     return Promise.reject(error);
   }
