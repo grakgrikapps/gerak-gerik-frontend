@@ -9,8 +9,10 @@ import PickCard from "@/components/shared/card/swipe/pick-card";
 import http from "@/lib/axios/http";
 import { Box } from "@mui/system";
 import { Typography } from "@mui/material";
+import { useSearchParams } from "next/navigation";
 
 function Home_pages() {
+  const search = useSearchParams();
   const dispatch = useDispatch();
   const arena = useSelector((state) => state.arena);
   const [cardList, setCardList] = React.useState([]);
@@ -21,7 +23,9 @@ function Home_pages() {
 
   React.useEffect(() => {
     http
-      .get(`/posts`, { params: { arena_id: currentArena?.id } })
+      .get(`/posts`, {
+        params: { arena_id: currentArena?.id, slug: search.get("slug") },
+      })
       .then((res) => {
         setCardList(res.data);
 

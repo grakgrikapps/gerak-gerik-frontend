@@ -32,7 +32,6 @@ function Bottom_bar() {
     (item) => item.profile_id === auth?.profile?.id
   );
 
-
   const handleSave = async () => {
     try {
       if (hasBookmark) {
@@ -89,6 +88,10 @@ function Bottom_bar() {
 
             if (item.label === "Arena") {
               router.push(`/arena`);
+            }
+
+            if (item.label === "Home") {
+              router.push(`/home`);
             }
 
             if (item.label === "Save") {
