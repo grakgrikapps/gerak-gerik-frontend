@@ -15,13 +15,13 @@ function Arena_pages() {
     http.get("/arena").then((res) => dispatch(setArena(res.data)));
   }, []);
 
+  {console.log("arena", arena);}
+
   return (
     <Container>
       {arena?.list?.map((item, index) => (
         <Arena_list
-          name={item?.name}
-          slug={item?.slug}
-          photo={item?.photo}
+          {...item}
           key={index}
         />
       ))}

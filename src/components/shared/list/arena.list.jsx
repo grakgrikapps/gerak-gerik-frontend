@@ -1,9 +1,22 @@
+import http from "@/lib/axios/http";
 import { Avatar, Chip, Grid, Typography } from "@mui/material";
 import React from "react";
 
-function Arena_list({ photo, name, slug }) {
-  const handleFollow = () => {};
-  
+function Arena_list({ photo, name, slug, user_arenas, id }) {
+  const [hasFollow, setHasFollow] = React.useState(
+    Boolean(user_arenas?.length)
+  );
+
+  const handleFollow = async () => {
+    if (hasFollow) {
+      await http.get(`/auth/profile/arena/${id}/leave`);
+      setHasFollow(false);
+    } else {
+      await http.get(`/auth/profile/arena/${id}/join`);
+      setHasFollow(true);
+    }
+  };
+
   return (
     <Grid
       container
@@ -24,10 +37,11 @@ function Arena_list({ photo, name, slug }) {
       </Grid>
       <Grid size={2}>
         <Chip
-          variant="outlined"
-          label="Follow"
+          variant={hasFollow ? "contained" : "outlined"}
+          label={hasFollow ? "Unfollow" : "Follow"}
+          color={"primary"}
           size="small"
-          onClick={() => {}}
+          onClick={() => handleFollow()}
           sx={{ width: "100%" }}
         />
       </Grid>

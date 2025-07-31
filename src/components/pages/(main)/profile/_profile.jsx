@@ -112,13 +112,13 @@ function Profile_Page() {
                 src={profile?.photo}
               />
 
-              {/* <Chip
-                label="Edit Profile"
+              <Chip
+                label="Add Post"
                 variant="outlined"
                 size="small"
                 sx={{ borderRadius: "4px", border: "1px solid #000000" }}
-                onClick={() => router.push("/profile/edit")}
-              /> */}
+                onClick={() => router.push("/post/create")}
+              />
             </Box>
 
             {/* Content */}

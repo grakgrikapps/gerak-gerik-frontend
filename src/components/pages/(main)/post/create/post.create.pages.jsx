@@ -141,7 +141,7 @@ function Post_create_pages() {
             fullWidth
             size="small"
             name="url"
-            placeholder="https://www.youtube.com/watch?v=LXb3EKWsInQ"
+            placeholder="https://www.youtube.com/embed/zJWwZRhyzns"
             value={formik.values.url}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
