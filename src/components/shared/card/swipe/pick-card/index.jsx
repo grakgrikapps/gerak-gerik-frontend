@@ -185,8 +185,6 @@ function PickCard({ cardList = [], onEvaluate }) {
   const upvotePercentage = totalVotes > 0 ? (upvotes / totalVotes) * 100 : 0;
   const downvotePercentage = 100 - upvotePercentage;
 
-  console.log("posts?.pause", posts?.pause);
-
   return (
     <>
       <div className={styles.container}>
