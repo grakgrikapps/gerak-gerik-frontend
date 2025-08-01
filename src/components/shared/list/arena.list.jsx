@@ -1,8 +1,9 @@
 import http from "@/lib/axios/http";
-import { Avatar, Chip, Grid, Typography } from "@mui/material";
+import { Avatar, Box, Chip, Grid, Typography } from "@mui/material";
+import Link from "next/link";
 import React from "react";
 
-function Arena_list({ photo, name, slug, user_arenas, id }) {
+function Arena_list({ photo, name, slug, user_arenas, id, handleRefresh }) {
   const [hasFollow, setHasFollow] = React.useState(
     Boolean(user_arenas?.length)
   );
@@ -15,6 +16,8 @@ function Arena_list({ photo, name, slug, user_arenas, id }) {
       await http.get(`/auth/profile/arena/${id}/join`);
       setHasFollow(true);
     }
+
+    handleRefresh();
   };
 
   return (
@@ -25,15 +28,21 @@ function Arena_list({ photo, name, slug, user_arenas, id }) {
       alignItems="center"
     >
       <Grid size={1}>
-        <Avatar src={photo} />
+        <Link href={`/arena/${slug}`}>
+          <Avatar src={photo} />
+        </Link>
       </Grid>
       <Grid size={8.2}>
-        <Typography variant="h6" fontWeight={500}>
-          {name}
-        </Typography>
-        <Typography variant="body2" fontSize="10px" color="#687684">
-          @{slug}
-        </Typography>
+        <Link href={`/arena/${slug}`}>
+          <Box>
+            <Typography variant="h6" fontWeight={500}>
+              {name}
+            </Typography>
+            <Typography variant="body2" fontSize="10px" color="#687684">
+              @{slug}
+            </Typography>
+          </Box>
+        </Link>
       </Grid>
       <Grid size={2}>
         <Chip

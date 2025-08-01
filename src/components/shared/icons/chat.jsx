@@ -2,7 +2,7 @@ import React from "react";
 import { SvgIcon } from "@mui/material";
 function Icon({ color = "#1C1C1C" }) {
   return (
-    <SvgIcon sx={{ width: "30px", height: "30px" }}>
+    <SvgIcon sx={{ width: "37px", height: "37px" }}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
