@@ -15,6 +15,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setMyArena } from "@/lib/rtk/features/auth/authSlice";
 import { setCurrentArena } from "@/lib/rtk/features/arena/arenaSlice";
 import http from "@/lib/axios/http";
+import { initiationPost } from "@/lib/rtk/features/posts/postSlice";
 
 function Top_bar() {
   const dispatch = useDispatch();
@@ -63,7 +64,10 @@ function Top_bar() {
                     key={item}
                     size="small"
                     color="inherit"
-                    onClick={() => dispatch(setCurrentArena(item))}
+                    onClick={() => {
+                      dispatch(setCurrentArena(item));
+                      dispatch(initiationPost([]));
+                    }}
                     sx={{
                       fontWeight: item === arena.current ? 700 : 400,
                       borderBottom:
