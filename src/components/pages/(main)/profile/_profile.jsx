@@ -140,14 +140,14 @@ function Profile_Page() {
             {/* Following & Followers */}
             <Box display="flex" mt="10px" gap="20px">
               <Box display="flex" gap="5px" alignItems="center">
-                <Typography variant="h6">
+                <Typography variant="h6" lineHeight="0px">
                   {profile?.following?.length ?? 0}
                 </Typography>
                 <Typography>Following</Typography>
               </Box>
 
               <Box display="flex" gap="5px" alignItems="center">
-                <Typography variant="h6">
+                <Typography variant="h6" lineHeight="0px">
                   {profile?.followers?.length ?? 0}
                 </Typography>
                 <Typography>Followers</Typography>

@@ -11,8 +11,14 @@ function Arena_pages() {
   const arena = useSelector((state) => state.arena);
   const dispatch = useDispatch();
 
+  const handleRefresh = () => {
+    http.get("/arena").then((res) => {
+      dispatch(setArena(res.data));
+    });
+  };
+
   React.useEffect(() => {
-    http.get("/arena").then((res) => dispatch(setArena(res.data)));
+    handleRefresh();
   }, []);
 
   return (
@@ -20,7 +26,8 @@ function Arena_pages() {
       {arena?.list?.map((item, index) => (
         <Arena_list
           {...item}
-          key={index}
+          key={`${index}_${item?.user_arenas?.length}`}
+          handleRefresh={handleRefresh}
         />
       ))}
     </Container>

@@ -14,8 +14,8 @@ import ChevronLeftIcon from "@/components/shared/icons/chevron-left";
 import Card_Post from "@/components/shared/card/post/post.card";
 import http from "@/lib/axios/http";
 import { useParams, useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { motion, AnimatePresence } from "framer-motion";
+import { useSelector } from "react-redux";
+import { motion } from "framer-motion";
 
 function a11yProps(index) {
   return {
@@ -24,17 +24,17 @@ function a11yProps(index) {
   };
 }
 
-function Profile_Detail_Page() {
+function Arena_Detail_Page() {
   const router = useRouter();
-  const { id } = useParams();
+  const { slug } = useParams();
   const auth = useSelector((state) => state.auth);
 
   const [value, setValue] = React.useState(0);
-  const [profile, setProfile] = React.useState(null);
+  const [arena, setArena] = React.useState(null);
   const [postLists, setPostLists] = React.useState([]);
   const [playingVideoId, setPlayingVideoId] = React.useState(null);
 
-  const hasFollow = profile?.followers?.find(
+  const hasFollow = arena?.user_arenas?.find(
     (item) => item.profile_id === auth?.profile?.id
   );
 
@@ -42,29 +42,20 @@ function Profile_Detail_Page() {
     setValue(newValue);
   };
 
-  const handleRefresh = () => {
-    const url =
-      value === 0
-        ? `/auth/profile/posts?profile_id=${profile?.id}`
-        : `/auth/profile/posts/bookmarks?profile_id=${profile?.id}`;
-
-    http.get(url).then((res) => setPostLists(res.data));
-  };
-
-  const handleFollow = async () => {
+  const handleJoin = async () => {
     if (hasFollow) {
-      await http.get(`/auth/profile/${profile?.id}/unfollow`);
-      setProfile((prev) => ({
+      await http.get(`/auth/profile/arena/${arena?.id}/leave`);
+      setArena((prev) => ({
         ...prev,
-        followers: prev.followers.filter(
+        user_arenas: prev.user_arenas.filter(
           (item) => item.profile_id !== auth?.profile?.id
         ),
       }));
     } else {
-      await http.get(`/auth/profile/${profile?.id}/follow`);
-      setProfile((prev) => ({
+      await http.get(`/auth/profile/arena/${arena?.id}/join`);
+      setArena((prev) => ({
         ...prev,
-        followers: [...prev.followers, { profile_id: auth?.profile?.id }],
+        user_arenas: [...prev.user_arenas, { profile_id: auth?.profile?.id }],
       }));
     }
   };
@@ -78,19 +69,20 @@ function Profile_Detail_Page() {
   };
 
   React.useEffect(() => {
-    http
-      .get(`/auth/profile/detail/${id}`)
-      .then((res) => setProfile(res.data?.[0]?.profile));
+    http.get(`/arena/${slug}`).then((res) => {
+      setArena(res.data);
+      setPostLists(res.data.posts);
+    });
   }, []);
 
   React.useEffect(() => {
-    if (profile) handleRefresh();
-  }, [value, profile]);
+    // if (arena) handleRefresh();
+  }, [value, arena]);
 
   return (
     <>
       {/* Header */}
-      <Box height="350px">
+      <Box height="320px">
         {/* Header Background */}
         <Box
           height="120px"
@@ -102,7 +94,7 @@ function Profile_Detail_Page() {
             <IconButton
               size="small"
               sx={{ backgroundColor: "#00000055", marginTop: "-20px" }}
-              onClick={() => router.push("/home")}
+              onClick={() => router.push("/arena")}
             >
               <ChevronLeftIcon color="#fff" />
             </IconButton>
@@ -116,6 +108,7 @@ function Profile_Detail_Page() {
             <Box
               display="flex"
               justifyContent="space-between"
+              Followers
               alignItems="center"
               marginBottom="10px"
             >
@@ -128,32 +121,24 @@ function Profile_Detail_Page() {
                   marginTop: "-30px",
                   marginLeft: "-10px",
                 }}
-                src={profile?.photo}
+                src={arena?.photo}
               />
 
               <Chip
-                label={hasFollow ? "Unfollow" : "Follow"}
+                label={hasFollow ? "Leave" : "Join"}
                 variant={hasFollow ? "contained" : "outlined"}
                 size="small"
                 color="primary"
                 sx={{ borderRadius: "4px" }}
-                onClick={() => handleFollow()}
+                onClick={() => handleJoin()}
               />
             </Box>
 
             {/* Content */}
             <Box>
-              <Typography variant="h5">{profile?.fullname}</Typography>
-              <Typography
-                variant="body1"
-                color="#687684"
-                fontSize="14px"
-                sx={{ mt: "1px", mb: "5px" }}
-              >
-                @{profile?.username}
-              </Typography>
+              <Typography variant="h5">{arena?.name}</Typography>
               <Typography variant="body2" color="#141619" fontSize="12px">
-                {profile?.bio ?? "No bio yet"}
+                {arena?.description ?? "No description yet"}
               </Typography>
             </Box>
 
@@ -161,16 +146,9 @@ function Profile_Detail_Page() {
             <Box display="flex" mt="10px" gap="20px">
               <Box display="flex" gap="5px" alignItems="center">
                 <Typography variant="h6" lineHeight="0px">
-                  {profile?.following?.length ?? 0}
+                  {arena?.user_arenas?.length ?? 0}
                 </Typography>
-                <Typography>Following</Typography>
-              </Box>
-
-              <Box display="flex" gap="5px" alignItems="center">
-                <Typography variant="h6" lineHeight="0px">
-                  {profile?.followers?.length ?? 0}
-                </Typography>
-                <Typography>Followers</Typography>
+                <Typography>Member</Typography>
               </Box>
             </Box>
           </Container>
@@ -208,8 +186,6 @@ function Profile_Detail_Page() {
                     }}
                     {...a11yProps(0)}
                   />
-                  {/* <Tab label="Replies" {...a11yProps(1)} /> */}
-                  <Tab label="Bookmarks" {...a11yProps(2)} />
                 </Tabs>
               </Box>
             </Container>
@@ -255,7 +231,8 @@ function Profile_Detail_Page() {
                 {...item}
                 playingVideoId={playingVideoId}
                 setPlayingVideoId={setPlayingVideoId}
-                handleRefresh={handleRefresh}
+                handleRefresh={() => {}}
+                disabled
               />
             </motion.div>
           ))}
@@ -265,4 +242,4 @@ function Profile_Detail_Page() {
   );
 }
 
-export default Profile_Detail_Page;
+export default Arena_Detail_Page;

@@ -52,8 +52,9 @@ function Bottom_bar() {
       height="65px"
       borderTop="1px solid #95959599"
       display="flex"
-      alignItems="center"
+      alignItems="flex-end"
       justifyContent="space-around"
+      pb="5px"
     >
       {[
         {

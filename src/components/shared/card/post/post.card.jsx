@@ -114,35 +114,15 @@ function Post_Card(props) {
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
               style={{ border: "none", background: "none", padding: 0 }}
             >
-              <Tooltip
-                title="Upvote"
-                slotProps={{
-                  popper: {
-                    modifiers: [
-                      {
-                        name: "offset",
-                        options: {
-                          offset: [0, -5],
-                        },
-                      },
-                    ],
-                  },
-                }}
-              >
-                <IconButton
-                  size="small"
-                  disabled={isVoting}
-                  onClick={() => handleVote("up")}
-                >
-                  {props?.upvote?.includes(userId) ? (
-                    <ThumbUpIcon size={{ width: "18px", height: "18px" }} />
-                  ) : (
-                    <ThumbUpOutlineIcon
-                      size={{ width: "18px", height: "18px" }}
-                    />
-                  )}
-                </IconButton>
-              </Tooltip>
+              <IconButton size="small" disabled={isVoting} onClick={() => {}}>
+                {props?.upvote?.includes(userId) ? (
+                  <ThumbUpIcon size={{ width: "18px", height: "18px" }} />
+                ) : (
+                  <ThumbUpOutlineIcon
+                    size={{ width: "18px", height: "18px" }}
+                  />
+                )}
+              </IconButton>
             </motion.div>
 
             <>
@@ -161,35 +141,15 @@ function Post_Card(props) {
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
               style={{ border: "none", background: "none", padding: 0 }}
             >
-              <Tooltip
-                title="Downvote"
-                slotProps={{
-                  popper: {
-                    modifiers: [
-                      {
-                        name: "offset",
-                        options: {
-                          offset: [0, -5],
-                        },
-                      },
-                    ],
-                  },
-                }}
-              >
-                <IconButton
-                  size="small"
-                  disabled={isVoting}
-                  onClick={() => handleVote("down")}
-                >
-                  {props?.downvote?.includes(userId) ? (
-                    <ThumbDownIcon size={{ width: "18px", height: "18px" }} />
-                  ) : (
-                    <ThumbDownOutlineIcon
-                      size={{ width: "18px", height: "18px" }}
-                    />
-                  )}
-                </IconButton>
-              </Tooltip>
+              <IconButton size="small" disabled={isVoting} onClick={() => {}}>
+                {props?.downvote?.includes(userId) ? (
+                  <ThumbDownIcon size={{ width: "18px", height: "18px" }} />
+                ) : (
+                  <ThumbDownOutlineIcon
+                    size={{ width: "18px", height: "18px" }}
+                  />
+                )}
+              </IconButton>
             </motion.div>
 
             <>
@@ -210,25 +170,9 @@ function Post_Card(props) {
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
               style={{ border: "none", background: "none", padding: 0 }}
             >
-              <Tooltip
-                title="Reply"
-                slotProps={{
-                  popper: {
-                    modifiers: [
-                      {
-                        name: "offset",
-                        options: {
-                          offset: [0, -5],
-                        },
-                      },
-                    ],
-                  },
-                }}
-              >
-                <IconButton size="small">
-                  <ChatBubleIcon size={{ width: "18px", height: "18px" }} />
-                </IconButton>
-              </Tooltip>
+              <IconButton size="small">
+                <ChatBubleIcon size={{ width: "18px", height: "18px" }} />
+              </IconButton>
             </motion.div>
 
             <>
@@ -247,25 +191,9 @@ function Post_Card(props) {
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
             style={{ border: "none", background: "none", padding: 0 }}
           >
-            <Tooltip
-              title="Share"
-              slotProps={{
-                popper: {
-                  modifiers: [
-                    {
-                      name: "offset",
-                      options: {
-                        offset: [0, -5],
-                      },
-                    },
-                  ],
-                },
-              }}
-            >
-              <IconButton size="small">
-                <ShareUpIcon size={{ width: "18px", height: "18px" }} />
-              </IconButton>
-            </Tooltip>
+            <IconButton size="small">
+              <ShareUpIcon size={{ width: "18px", height: "18px" }} />
+            </IconButton>
           </motion.div>
 
           <motion.div
@@ -273,31 +201,13 @@ function Post_Card(props) {
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
             style={{ border: "none", background: "none", padding: 0 }}
           >
-            <Tooltip
-              title="Bookmark"
-              slotProps={{
-                popper: {
-                  modifiers: [
-                    {
-                      name: "offset",
-                      options: {
-                        offset: [0, -5],
-                      },
-                    },
-                  ],
-                },
-              }}
-            >
-              <IconButton size="small" onClick={handleSave}>
-                {hasBookmark ? (
-                  <BookmarkIcon size={{ width: "18px", height: "18px" }} />
-                ) : (
-                  <BookmarkOutlineIcon
-                    size={{ width: "18px", height: "18px" }}
-                  />
-                )}
-              </IconButton>
-            </Tooltip>
+            <IconButton size="small" onClick={handleSave}>
+              {hasBookmark ? (
+                <BookmarkIcon size={{ width: "18px", height: "18px" }} />
+              ) : (
+                <BookmarkOutlineIcon size={{ width: "18px", height: "18px" }} />
+              )}
+            </IconButton>
           </motion.div>
         </Box>
       </Grid>
