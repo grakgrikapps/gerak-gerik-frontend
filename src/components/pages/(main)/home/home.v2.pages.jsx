@@ -28,8 +28,6 @@ function Home_v2_pages() {
         .then((result) => dispatch(setCurrentPost(result?.data)));
   }, []);
 
-  console.log(posts)
-
   return (
     <Container disableGutters maxWidth={false} sx={{ p: 0, m: 0 }}>
       <ReactFullpage
@@ -43,18 +41,10 @@ function Home_v2_pages() {
             .get(`/posts/${list[destination.index].id}`)
             .then((result) => dispatch(setCurrentPost(result?.data)));
         }}
-        render={() => (
+        render={({ state }) => (
           <>
             {list.length > 0 &&
               list.map((section, index) => {
-                const alreadyVote = [
-                  ...section.downvote,
-                  ...section.upvote,
-                ].filter((item) => item === auth?.profile?.id);
-                // check if already give reaction
-                if (section.comments.length && alreadyVote.length) {
-                }
-
                 return (
                   <Box
                     anc
@@ -72,13 +62,11 @@ function Home_v2_pages() {
                   >
                     <PickCard
                       cardList={[posts?.initiation?.[index]]}
-                      onEvaluate={(card) => {
-                        // dispatch(
-                        //   initiationPost(
-                        //     posts?.initiation.filter((c) => c.slug !== card.slug)
-                        //   )
-                        // );
-                      }}
+                      active={
+                        Boolean(state?.destination?.index === index) ||
+                        (!state.destination && index === 0)
+                      }
+                      index={index}
                     />
                   </Box>
                 );

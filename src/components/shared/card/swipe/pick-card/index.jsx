@@ -12,7 +12,7 @@ import {
   setOpenComment,
   setPauseVideo,
 } from "@/lib/rtk/features/posts/postSlice";
-import { useSelector } from "react-redux";
+import { motion } from "framer-motion";
 import moment from "moment";
 import Link from "next/link";
 
@@ -25,7 +25,7 @@ const getPosition = (event) => {
   }
 };
 
-function PickCard({ cardList = [], onEvaluate }) {
+function PickCard({ cardList = [], onEvaluate, active, index }) {
   const interactionRef = useRef();
   const dispatch = useDispatch();
   const [isInteracting, setIsInteracting] = useState(false);
@@ -293,57 +293,55 @@ function PickCard({ cardList = [], onEvaluate }) {
           </>
         )}
 
-        {cardList.map((card, index) => {
-          const isActiveCard = index >= activeIndex;
-          const isLastCard = index === cardList.length - 1;
+        {active &&
+          cardList.map((card, index) => {
+            const isActiveCard = index >= activeIndex;
+            const isLastCard = index === cardList.length - 1;
 
-          return (
-            <div
-              key={index}
-              className={[styles.card, isActiveCard && styles.active]
-                .filter(Boolean)
-                .join(" ")}
-              {...(isLastCard && {
-                onTouchStart: handleStart,
-                onMouseDown: handleStart,
-              })}
-              onClick={() => {
-                if (isPlaying) {
-                  dispatch(setPauseVideo(true));
-                } else {
-                  dispatch(setPauseVideo(false));
-                }
-              }}
-            >
-              <div className={styles.card_inner}>
-                <div className={styles.image_wrap}>
-                  <ReactPlayer
-                    height="100%"
-                    width="100%"
-                    // muted
-                    loop
-                    // playing={isLastCard && !posts?.pause}
-                    // onPlaying={() =>
-                    //   setTimeout(() => {
-                    //     setIsPlaying(true);
-                    //   }, 100)
-                    // }
-                    onPause={() => setIsPlaying(false)}
-                    light={`https://img.youtube.com/vi/${getYouTubeIdFromEmbedUrl(
-                      card?.videos?.[0]?.url ?? ""
-                    )}/0.jpg`}
-                    src={card?.videos?.[0]?.url}
+            return (
+              <motion.div
+                key={index}
+                className={[styles.card, isActiveCard && styles.active]
+                  .filter(Boolean)
+                  .join(" ")}
+                initial={active ? { opacity: 0, scale: 0.9 } : false} // ⬅️ animasi masuk
+                animate={active ? { opacity: 1, scale: 1 } : {}} // ⬅️ animasi aktif
+                exit={{ opacity: 0, scale: 0.95 }} // ⬅️ animasi keluar
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                {...(isLastCard && {
+                  onTouchStart: handleStart,
+                  onMouseDown: handleStart,
+                })}
+                onClick={() => {
+                  if (isPlaying) {
+                    dispatch(setPauseVideo(true));
+                  } else {
+                    dispatch(setPauseVideo(false));
+                  }
+                }}
+              >
+                <div className={styles.card_inner}>
+                  <div className={styles.image_wrap}>
+                    <ReactPlayer
+                      height="100%"
+                      width="100%"
+                      loop
+                      onPause={() => setIsPlaying(false)}
+                      light={`https://img.youtube.com/vi/${getYouTubeIdFromEmbedUrl(
+                        card?.videos?.[0]?.url ?? ""
+                      )}/0.jpg`}
+                      src={card?.videos?.[0]?.url}
+                    />
+                  </div>
+
+                  <ProgressMask
+                    progress={progress}
+                    isInteracting={isInteracting}
                   />
                 </div>
-
-                <ProgressMask
-                  progress={progress}
-                  isInteracting={isInteracting}
-                />
-              </div>
-            </div>
-          );
-        })}
+              </motion.div>
+            );
+          })}
       </div>
 
       <Box px="5%" pt="15px">
@@ -353,7 +351,7 @@ function PickCard({ cardList = [], onEvaluate }) {
               <Avatar src={detail?.profile?.photo} />
             </Link>
           </Grid>
-          <Grid size={10.5}>
+          <Grid size={{ xs: 10.2, sm: 10.5 }}>
             <Box
               display="flex"
               justifyContent="space-between"

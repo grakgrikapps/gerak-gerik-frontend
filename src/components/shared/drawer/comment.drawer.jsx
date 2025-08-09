@@ -7,7 +7,14 @@ import {
   clearCommentReplies,
   setPauseVideo,
 } from "@/lib/rtk/features/posts/postSlice";
-import { Box, Typography, TextField, IconButton } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  IconButton,
+  Skeleton,
+  Grid,
+} from "@mui/material";
 import { useFormik } from "formik";
 import http from "@/lib/axios/http";
 import SendIcon from "@/components/shared/icons/send";
@@ -30,6 +37,7 @@ function Comment_drawer(props) {
 
   const [selectedReplies, setSelectedReplies] = React.useState(null);
   const [isSending, setIsSending] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false); // ⬅️ loading state
 
   const postId = posts?.current?.id;
 
@@ -123,13 +131,24 @@ function Comment_drawer(props) {
   React.useEffect(() => {
     if (props.open) {
       dispatch(setPauseVideo(true));
-      http.get(`/comments?post_id=${postId}`).then((res) => {
-        dispatch(setComment(res?.data ?? []));
-        dispatch(clearCommentReplies()); // clear replies
-      });
+      setIsLoading(true); // mulai loading
+      http
+        .get(`/comments?post_id=${postId}`)
+        .then((res) => {
+          dispatch(setComment(res?.data ?? []));
+          dispatch(clearCommentReplies());
+        })
+        .catch((err) => {
+          console.error("Gagal fetch komentar:", err);
+        })
+        .finally(() => {
+          setIsLoading(false); // selesai loading
+        });
     } else {
-      dispatch(setComment([]));
-      dispatch(clearCommentReplies()); // clear replies
+      setTimeout(() => {
+        dispatch(setComment([]));
+        dispatch(clearCommentReplies());
+      }, 200);
     }
   }, [props?.open]);
 
@@ -175,7 +194,33 @@ function Comment_drawer(props) {
           }}
         >
           <AnimatePresence mode="popLayout" initial={false}>
-            {posts?.comments.length === 0 && (
+            {isLoading ? (
+              // ⬅️ SKELETON LOADING
+              [...Array(3)].map((_, i) => (
+                <Box
+                  key={i}
+                  display="flex"
+                  flexDirection="column"
+                  gap={1}
+                  py={2}
+                >
+                  <Grid container justifyContent="space-between">
+                    <Grid size={1}>
+                      <Skeleton variant="circular" width={40} height={40} />
+                    </Grid>
+                    <Grid size={{ xs: 10.3, sm: 10.7 }}>
+                      <Skeleton
+                        variant="rectangular"
+                        height={20}
+                        width="80%"
+                        sx={{ mb: 1 }}
+                      />
+                      <Skeleton variant="rectangular" height={15} width="60%" />
+                    </Grid>
+                  </Grid>
+                </Box>
+              ))
+            ) : posts?.comments.length === 0 ? (
               <Box
                 display="flex"
                 flexDirection="column"
@@ -191,30 +236,30 @@ function Comment_drawer(props) {
                   Be the first to start the discussion.
                 </Typography>
               </Box>
+            ) : (
+              posts?.comments?.map((item, key) => (
+                <motion.div
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3, type: "spring" }}
+                >
+                  <Comment_list
+                    {...item}
+                    handleReplies={() => {
+                      formik.setFieldValue(
+                        "comment",
+                        `@${item?.profile?.username} `
+                      );
+                      setSelectedReplies(item);
+                      commentInput.current.focus();
+                    }}
+                  />
+                </motion.div>
+              ))
             )}
-
-            {posts?.comments?.map((item, key) => (
-              <motion.div
-                key={item.id}
-                layout
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3, type: "spring" }}
-              >
-                <Comment_list
-                  {...item}
-                  handleReplies={() => {
-                    formik.setFieldValue(
-                      "comment",
-                      `@${item?.profile?.username} `
-                    );
-                    setSelectedReplies(item);
-                    commentInput.current.focus();
-                  }}
-                />
-              </motion.div>
-            ))}
           </AnimatePresence>
         </Box>
 
