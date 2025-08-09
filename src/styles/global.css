@@ -1,3 +1,10 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .text-2-line {
   display: -webkit-box;
   line-clamp: 2;
@@ -54,4 +61,26 @@ a {
 .ytp-watermark {
   display: none !important;
   visibility: hidden !important;
+}
+
+[data-scroll-container] {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: 100vh;
+  scroll-behavior: smooth; /* transisi halus */
+  -webkit-overflow-scrolling: touch; /* biar di iOS halus */
+}
+
+section {
+  scroll-snap-align: start;
+  flex-shrink: 0; /* pastikan tiap section tidak mengecil */
+}
+
+.fp-watermark {
+  display: none;
+  visibility: hidden;
+}
+
+.fp-table {
+  justify-content: flex-start !important;
 }

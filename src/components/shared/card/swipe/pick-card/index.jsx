@@ -9,6 +9,7 @@ import ReactPlayer from "react-player";
 import { useDispatch } from "react-redux";
 import {
   setCurrentPost,
+  setOpenComment,
   setPauseVideo,
 } from "@/lib/rtk/features/posts/postSlice";
 import { useSelector } from "react-redux";
@@ -33,8 +34,7 @@ function PickCard({ cardList = [], onEvaluate }) {
   const [calcWidth, setCalcWidth] = useState(0);
   const [detail, setDetail] = useState({});
   const [isPlaying, setIsPlaying] = useState(false);
-
-  const posts = useSelector((state) => state.posts);
+  const [alreadyVote, setAlreadyVote] = useState(false); // 'horizontal' | 'vertical' | null
 
   const handleStart = useCallback((e) => {
     document.body.classList.add(styles.fix_container);
@@ -61,7 +61,7 @@ function PickCard({ cardList = [], onEvaluate }) {
     const dy = (y - interactionRef.current.y) * 0.5;
     const deg = (dx / 600) * -30;
 
-    $card.style.transform = `translate(${dx}px, ${dy}px) rotate(${deg}deg)`;
+    $card.style.transform = `translate(${dx}px) rotate(${deg}deg)`;
 
     const newProgress = clamp(dx / 100, -1, 1);
     setProgress(newProgress);
@@ -74,26 +74,8 @@ function PickCard({ cardList = [], onEvaluate }) {
     const isSelect = Math.abs(progress) === 1;
     const isGood = progress === 1;
 
-    const [, currentXString] =
-      $card.style.transform.match(/translate\(([^,]+), [^)]+\)/) || [];
-    const [, currentYString] =
-      $card.style.transform.match(/translate\([^,]+, ([^)]+)\)/) || [];
-    const [, currentRotateString] =
-      $card.style.transform.match(/rotate\(([^)]+)\)/) || [];
-
-    const currentX = parseInt(currentXString, 10);
-    const currentY = parseInt(currentYString, 10);
-    const currentRotate = parseInt(currentRotateString, 10);
-    const dx = isGood
-      ? window.innerWidth
-      : (window.innerWidth + $card.getBoundingClientRect().width) * -1;
-
     $card.style.transition = "transform 0.3s ease-in-out";
-    $card.style.transform = isSelect
-      ? `translate(${currentX + dx}px, ${currentY}px) rotate(${
-          currentRotate * 2
-        }deg)`
-      : "translate(0, 0) rotate(0deg)";
+    $card.style.transform = isSelect ? `` : "translate(0, 0) rotate(0deg)";
 
     interactionRef.current = undefined;
     setIsInteracting(false);
@@ -105,7 +87,7 @@ function PickCard({ cardList = [], onEvaluate }) {
     }
 
     setTimeout(async () => {
-      document.body.classList.remove(styles.fix_container);
+      // document.body.classList.remove(styles.fix_container);
 
       if (isSelect) {
         const selectedCard = cardList[cardList.length - 1];
@@ -116,6 +98,14 @@ function PickCard({ cardList = [], onEvaluate }) {
         } else {
           await http.get(`/posts/downvote/${selectedCard?.id}`);
         }
+
+        http.get(`/posts/${cardList[activeIndex]?.id}`).then((res) => {
+          setDetail(res?.data);
+          dispatch(setCurrentPost(res?.data));
+        });
+
+        dispatch(setOpenComment(true));
+        setAlreadyVote(true);
       }
     }, 300);
   }, [cardList, onEvaluate, progress]);
@@ -190,7 +180,7 @@ function PickCard({ cardList = [], onEvaluate }) {
       <div className={styles.container}>
         {/* <PickCardResult /> */}
 
-        {totalVotes > 0 && (
+        {totalVotes > 0 && alreadyVote && (
           <>
             {/* Left vertical progress */}
             <Box
@@ -330,36 +320,31 @@ function PickCard({ cardList = [], onEvaluate }) {
                     width="100%"
                     // muted
                     loop
-                    playing={isLastCard && !posts?.pause}
-                    onPlaying={() =>
-                      setTimeout(() => {
-                        setIsPlaying(true);
-                      }, 100)
-                    }
+                    // playing={isLastCard && !posts?.pause}
+                    // onPlaying={() =>
+                    //   setTimeout(() => {
+                    //     setIsPlaying(true);
+                    //   }, 100)
+                    // }
                     onPause={() => setIsPlaying(false)}
-                    light={
-                      !isLastCard &&
-                      `https://img.youtube.com/vi/${getYouTubeIdFromEmbedUrl(
-                        card?.videos?.[0]?.url ?? ""
-                      )}/0.jpg`
-                    }
+                    light={`https://img.youtube.com/vi/${getYouTubeIdFromEmbedUrl(
+                      card?.videos?.[0]?.url ?? ""
+                    )}/0.jpg`}
                     src={card?.videos?.[0]?.url}
                   />
                 </div>
 
-                {isLastCard && (
-                  <ProgressMask
-                    progress={progress}
-                    isInteracting={isInteracting}
-                  />
-                )}
+                <ProgressMask
+                  progress={progress}
+                  isInteracting={isInteracting}
+                />
               </div>
             </div>
           );
         })}
       </div>
 
-      <Box mt="30px">
+      <Box px="5%" pt="15px">
         <Grid container justifyContent="space-between">
           <Grid size={1}>
             <Link href={`/profile/${detail?.profile?.username}`}>

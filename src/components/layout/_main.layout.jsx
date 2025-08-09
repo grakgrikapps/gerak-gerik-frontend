@@ -25,7 +25,7 @@ function Main_layout({ children }) {
           display="flex"
           justifyContent="space-between"
           flexDirection="column"
-          height="99.5dvh"
+          height="100dvh"
         >
           {/* Top Bar */}
           <Top_bar />
@@ -33,7 +33,7 @@ function Main_layout({ children }) {
           {/* Main content area */}
           <Box
             sx={{
-              height: "calc(100dvh - 157px)",
+              height: "calc(100dvh)",
               overflow: "auto",
               "&::-webkit-scrollbar": { display: "none" },
             }}

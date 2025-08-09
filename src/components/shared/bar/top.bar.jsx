@@ -30,7 +30,7 @@ function Top_bar() {
   }, []);
 
   return (
-    <Box>
+    <Box position="relative">
       <Container>
         <Grid
           container

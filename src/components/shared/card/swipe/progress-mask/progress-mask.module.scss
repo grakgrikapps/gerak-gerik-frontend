@@ -80,3 +80,39 @@
     height: 30px;
   }
 }
+
+.label_left,
+.label_right {
+  font-size: 24px;       /* lebih besar */
+  font-weight: 700;      /* lebih tebal */
+  color: #fff;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+.label_left {
+  right: 100%;
+  margin-right: 8px;
+}
+
+.label_right {
+  left: 100%;
+  margin-left: 8px;
+}
+
+.label_left,
+.label_right {
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+  -webkit-transition: opacity 0.4s ease-out;
+  -moz-transition: opacity 0.4s ease-out;
+  -ms-transition: opacity 0.4s ease-out;
+  -o-transition: opacity 0.4s ease-out;
+}
+
+.active .label_left,
+.active .label_right {
+  opacity: 1;
+}

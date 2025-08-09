@@ -8,6 +8,7 @@ const initialState = {
   replies: {},
   pause: false,
   playing: false,
+  openComment: false,
 };
 
 // Slice definition
@@ -48,6 +49,9 @@ export const postsSlice = createAppSlice({
     clearCommentReplies: create.reducer((state) => {
       state.replies = {};
     }),
+    setOpenComment: create.reducer((state, action) => {
+      state.openComment = action.payload;
+    }),
   }),
 });
 
@@ -62,4 +66,5 @@ export const {
   setCurrentRemoveToBookmark,
   setPauseVideo,
   setPlayVideo,
+  setOpenComment,
 } = postsSlice.actions;
