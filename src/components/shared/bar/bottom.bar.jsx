@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, IconButton, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 
@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setCurrentAddToBookmark,
   setCurrentRemoveToBookmark,
+  setOpenComment,
 } from "@/lib/rtk/features/posts/postSlice";
 
 function Bottom_bar() {
@@ -47,6 +48,10 @@ function Bottom_bar() {
     }
   };
 
+  useEffect(() => {
+    dispatch(setOpenComment(false));
+  }, []);
+
   return (
     <Box
       height="65px"
@@ -55,6 +60,7 @@ function Bottom_bar() {
       alignItems="flex-end"
       justifyContent="space-around"
       pb="5px"
+      position="relative"
     >
       {[
         {
@@ -98,6 +104,10 @@ function Bottom_bar() {
             if (item.label === "Save") {
               handleSave();
             }
+
+            if (item.label === "Comment") {
+              dispatch(setOpenComment(true));
+            }
           }}
         >
           {item.icon}
@@ -108,9 +118,10 @@ function Bottom_bar() {
       ))}
 
       <Comment_drawer
-        open={Boolean(selected === "Comment")}
+        open={posts?.openComment}
         handleClose={() => {
           setSelected("Home");
+          dispatch(setOpenComment(false));
         }}
       />
 

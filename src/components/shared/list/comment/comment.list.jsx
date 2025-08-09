@@ -110,7 +110,7 @@ function Comment_list(props) {
 
   return (
     <Grid container justifyContent="space-between" mb="10px">
-      <Grid>
+      <Grid size={1}>
         <Link href={`/profile/${props?.profile?.username}`}>
           <Avatar
             sizes="small"
@@ -119,7 +119,7 @@ function Comment_list(props) {
           />
         </Link>
       </Grid>
-      <Grid size={10.7}>
+      <Grid size={{ xs: 10.3, sm: 10.7 }}>
         {/* Comment Head */}
         <Box
           display="flex"

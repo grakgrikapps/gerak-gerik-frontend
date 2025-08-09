@@ -25,7 +25,7 @@ function Main_layout({ children }) {
           display="flex"
           justifyContent="space-between"
           flexDirection="column"
-          height="99.5dvh"
+          height="100dvh"
         >
           {/* Top Bar */}
           <Top_bar />

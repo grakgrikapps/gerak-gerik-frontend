@@ -58,18 +58,24 @@ function ProgressMask({ progress, isInteracting }) {
 
         <div className={styles.icon_wrap}>
           {isGood && (
-            <img
-              src={"/thumb-up.svg"}
-              className={styles.icon_good}
-              alt="good"
-            />
+            <>
+              <img
+                src={"/thumb-up.svg"}
+                className={styles.icon_good}
+                alt="good"
+              />
+              <span className={styles.label_right}>Grak</span>
+            </>
           )}
           {isBad && (
-            <img
-              src={"/thumb-down.svg"}
-              className={styles.icon_bad}
-              alt="bad"
-            />
+            <>
+              <span className={styles.label_left}>Grik</span>
+              <img
+                src={"/thumb-down.svg"}
+                className={styles.icon_bad}
+                alt="bad"
+              />
+            </>
           )}
         </div>
       </div>

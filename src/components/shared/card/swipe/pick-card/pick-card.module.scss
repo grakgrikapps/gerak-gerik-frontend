@@ -9,12 +9,12 @@
   z-index: 10;
   // flex: 1;
   width: 100%;
-  height: calc(100dvh - 300px);
+  height: calc(100dvh - 250px);
   max-width: 500px;
   // height: 100%;
   // margin: 0 auto;
   touch-action: none;
-  margin-top: -7dvh;
+  overflow: hidden;
 }
 
 .card_inner {
@@ -72,9 +72,8 @@
 .image_wrap {
   position: relative;
   overflow: hidden;
-  height: calc(100dvh - 200px);
+  height: calc(100dvh - 250px);
 }
-
 
 // .name {
 //   flex: 1;
@@ -126,8 +125,17 @@
 @media screen and (max-width: 800px) {
   .container {
     max-width: 100%;
-    margin-top: -10dvh;
+    height: calc(100dvh - 220px);
+    overflow: hidden;
   }
+
+  
+.image_wrap {
+  position: relative;
+  overflow: hidden;
+  height: calc(100dvh - 220px);
+}
+
 
   .button_wrap {
     display: flex;
