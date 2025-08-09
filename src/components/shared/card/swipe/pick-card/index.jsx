@@ -6,7 +6,7 @@ import ProgressMask from "../progress-mask";
 import { Avatar, Typography } from "@mui/material";
 import { Box, Grid } from "@mui/system";
 import ReactPlayer from "react-player";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setCurrentPost,
   setOpenComment,
@@ -35,6 +35,8 @@ function PickCard({ cardList = [], onEvaluate, active, index }) {
   const [detail, setDetail] = useState({});
   const [isPlaying, setIsPlaying] = useState(false);
   const [alreadyVote, setAlreadyVote] = useState(false); // 'horizontal' | 'vertical' | null
+
+  const posts = useSelector((state) => state.posts);
 
   const handleStart = useCallback((e) => {
     document.body.classList.add(styles.fix_container);
@@ -169,6 +171,13 @@ function PickCard({ cardList = [], onEvaluate, active, index }) {
       });
     }
   }, [activeIndex]);
+
+  useEffect(() => {
+    if (active) {
+      setIsPlaying(true);
+      dispatch(setPauseVideo(false));
+    }
+  }, [active]);
 
   const upvotes = detail?.upvote?.length ?? 0;
   const downvotes = detail?.downvote?.length ?? 0;
@@ -326,10 +335,18 @@ function PickCard({ cardList = [], onEvaluate, active, index }) {
                       height="100%"
                       width="100%"
                       loop
+                      playing={!posts?.pause}
+                      playsInline
+                      // muted
+                      onPlaying={() =>
+                        setTimeout(() => {
+                          setIsPlaying(true);
+                        }, 100)
+                      }
                       onPause={() => setIsPlaying(false)}
-                      light={`https://img.youtube.com/vi/${getYouTubeIdFromEmbedUrl(
-                        card?.videos?.[0]?.url ?? ""
-                      )}/0.jpg`}
+                      // light={`https://img.youtube.com/vi/${getYouTubeIdFromEmbedUrl(
+                      //   card?.videos?.[0]?.url ?? ""
+                      // )}/0.jpg`}
                       src={card?.videos?.[0]?.url}
                     />
                   </div>
