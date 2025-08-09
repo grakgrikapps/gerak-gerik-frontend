@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import LocomotiveScroll from "locomotive-scroll";
-import "locomotive-scroll/dist/locomotive-scroll.css";
 import { Box, Container } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import PickCard from "@/components/shared/card/swipe/pick-card";
