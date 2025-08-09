@@ -104,8 +104,11 @@ function PickCard({ cardList = [], onEvaluate }) {
           dispatch(setCurrentPost(res?.data));
         });
 
-        dispatch(setOpenComment(true));
         setAlreadyVote(true);
+
+        setTimeout(() => {
+          dispatch(setOpenComment(true));
+        }, 1000);
       }
     }, 300);
   }, [cardList, onEvaluate, progress]);
@@ -163,7 +166,6 @@ function PickCard({ cardList = [], onEvaluate }) {
     if (activeIndex >= 0) {
       http.get(`/posts/${cardList[activeIndex]?.id}`).then((res) => {
         setDetail(res?.data);
-        dispatch(setCurrentPost(res?.data));
       });
     }
   }, [activeIndex]);

@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from "react-redux";
 import PickCard from "@/components/shared/card/swipe/pick-card";
 
 import ReactFullpage from "@fullpage/react-fullpage";
+import http from "@/lib/axios/http";
+import { setCurrentPost } from "@/lib/rtk/features/posts/postSlice";
 
 function Home_v2_pages() {
   const posts = useSelector((state) => state.posts);
@@ -13,11 +15,20 @@ function Home_v2_pages() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // panggil rebuild setelah data siap 
+    // panggil rebuild setelah data siap
     if (typeof window !== "undefined" && window.fullpage_api) {
       window.fullpage_api.reBuild();
     }
   }, []);
+
+  useEffect(() => {
+    if (list.length !== 0)
+      http
+        .get(`/posts/${list?.[0]?.id}`)
+        .then((result) => dispatch(setCurrentPost(result?.data)));
+  }, []);
+
+  console.log(posts)
 
   return (
     <Container disableGutters maxWidth={false} sx={{ p: 0, m: 0 }}>
@@ -27,6 +38,11 @@ function Home_v2_pages() {
         controlArrows={false}
         fitToSection
         scrollOverflow={false}
+        onLeave={(origin, destination, direction) => {
+          http
+            .get(`/posts/${list[destination.index].id}`)
+            .then((result) => dispatch(setCurrentPost(result?.data)));
+        }}
         render={() => (
           <>
             {list.length > 0 &&
@@ -34,36 +50,38 @@ function Home_v2_pages() {
                 const alreadyVote = [
                   ...section.downvote,
                   ...section.upvote,
-                ].filter((item) => item === auth.profile.id);
+                ].filter((item) => item === auth?.profile?.id);
                 // check if already give reaction
-                if ((section.comments.length && alreadyVote.length)) {
-                  return (
-                    <Box
-                      key={section.id}
-                      className="section fp-height-responsive"
-                      sx={{
-                        height: "100dvh !important",
-                        width: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                        // justifyContent: "center",
-                        overflow: "hidden !important",
-                        pt: "10px",
-                      }}
-                    >
-                      <PickCard
-                        cardList={[posts?.initiation?.[index]]}
-                        onEvaluate={(card) => {
-                          // dispatch(
-                          //   initiationPost(
-                          //     posts?.initiation.filter((c) => c.slug !== card.slug)
-                          //   )
-                          // );
-                        }}
-                      />
-                    </Box>
-                  );
+                if (section.comments.length && alreadyVote.length) {
                 }
+
+                return (
+                  <Box
+                    anc
+                    key={section.id}
+                    className="section fp-height-responsive"
+                    sx={{
+                      height: "100dvh !important",
+                      width: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      // justifyContent: "center",
+                      overflow: "hidden !important",
+                      pt: "10px",
+                    }}
+                  >
+                    <PickCard
+                      cardList={[posts?.initiation?.[index]]}
+                      onEvaluate={(card) => {
+                        // dispatch(
+                        //   initiationPost(
+                        //     posts?.initiation.filter((c) => c.slug !== card.slug)
+                        //   )
+                        // );
+                      }}
+                    />
+                  </Box>
+                );
               })}
           </>
         )}
