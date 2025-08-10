@@ -63,13 +63,12 @@ function Home_v2_pages() {
             .get(`/posts/${list[destination.index].id}`)
             .then((result) => dispatch(setCurrentPost(result?.data)));
         }}
-        render={({ state }) => (
+        render={({ state, ...props }) => (
           <>
             {list.length > 0 &&
               list.map((section, index) => {
                 return (
                   <Box
-                    anc
                     key={section.id}
                     className="section fp-height-responsive"
                     sx={{
@@ -88,6 +87,14 @@ function Home_v2_pages() {
                         Boolean(state?.destination?.index === index) ||
                         (!state.destination && index === 0)
                       }
+                      disableScroll={() =>{
+                        window.fullpage_api.setAllowScrolling(false, "down");
+                        window.fullpage_api.setAllowScrolling(false, "up");
+                      }}
+                      activeScroll={() => {
+                        window.fullpage_api.setAllowScrolling(true, 'down');
+                        window.fullpage_api.setAllowScrolling(true, "up");
+                      }}
                       index={index}
                     />
                   </Box>

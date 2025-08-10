@@ -25,7 +25,13 @@ const getPosition = (event) => {
   }
 };
 
-function PickCard({ cardList = [], onEvaluate, active, index }) {
+function PickCard({
+  cardList = [],
+  onEvaluate,
+  active,
+  disableScroll,
+  activeScroll,
+}) {
   const interactionRef = useRef();
   const dispatch = useDispatch();
   const [isInteracting, setIsInteracting] = useState(false);
@@ -64,6 +70,7 @@ function PickCard({ cardList = [], onEvaluate, active, index }) {
     const deg = (dx / 600) * -30;
 
     $card.style.transform = `translate(${dx}px) rotate(${deg}deg)`;
+    disableScroll();
 
     const newProgress = clamp(dx / 100, -1, 1);
     setProgress(newProgress);
@@ -91,6 +98,7 @@ function PickCard({ cardList = [], onEvaluate, active, index }) {
     setTimeout(async () => {
       // document.body.classList.remove(styles.fix_container);
 
+      activeScroll();
       if (isSelect) {
         const selectedCard = cardList[cardList.length - 1];
         onEvaluate?.(selectedCard, isGood ? "good" : "bad");
@@ -101,17 +109,20 @@ function PickCard({ cardList = [], onEvaluate, active, index }) {
           await http.get(`/posts/downvote/${selectedCard?.id}`);
         }
 
-        http.get(`/posts/${cardList[activeIndex]?.id}`).then((res) => {
-          setDetail(res?.data);
-          dispatch(setCurrentPost(res?.data));
-        });
+        if (activeIndex >= 0)
+          http.get(`/posts/${cardList[activeIndex]?.id}`).then((res) => {
+            setDetail(res?.data);
+            dispatch(setCurrentPost(res?.data));
+          });
 
         setAlreadyVote(true);
 
         setTimeout(() => {
           dispatch(setOpenComment(true));
-        }, 5000);
+        }, 100);
       }
+
+      // activeScroll();
     }, 300);
   }, [cardList, onEvaluate, progress]);
 
@@ -127,7 +138,7 @@ function PickCard({ cardList = [], onEvaluate, active, index }) {
       window.removeEventListener("mouseup", handleEnd);
       window.removeEventListener("touchend", handleEnd);
     };
-  }, [handleMove, handleEnd]);
+  }, [handleMove, handleEnd, isInteracting]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -165,9 +176,10 @@ function PickCard({ cardList = [], onEvaluate, active, index }) {
   }, [cardList]);
 
   useEffect(() => {
-    http.get(`/posts/${cardList[activeIndex]?.id}`).then((res) => {
-      setDetail(res?.data);
-    });
+    if (activeIndex >= 0)
+      http.get(`/posts/${cardList[activeIndex]?.id}`).then((res) => {
+        setDetail(res?.data);
+      });
   }, [activeIndex]);
 
   useEffect(() => {
