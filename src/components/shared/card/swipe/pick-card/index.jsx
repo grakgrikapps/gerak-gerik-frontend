@@ -110,7 +110,7 @@ function PickCard({ cardList = [], onEvaluate, active, index }) {
 
         setTimeout(() => {
           dispatch(setOpenComment(true));
-        }, 1000);
+        }, 5000);
       }
     }, 300);
   }, [cardList, onEvaluate, progress]);
