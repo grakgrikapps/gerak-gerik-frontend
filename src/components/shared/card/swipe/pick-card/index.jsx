@@ -165,11 +165,9 @@ function PickCard({ cardList = [], onEvaluate, active, index }) {
   }, [cardList]);
 
   useEffect(() => {
-    if (activeIndex >= 0) {
-      http.get(`/posts/${cardList[activeIndex]?.id}`).then((res) => {
-        setDetail(res?.data);
-      });
-    }
+    http.get(`/posts/${cardList[activeIndex]?.id}`).then((res) => {
+      setDetail(res?.data);
+    });
   }, [activeIndex]);
 
   useEffect(() => {

@@ -7,12 +7,19 @@ import PickCard from "@/components/shared/card/swipe/pick-card";
 
 import ReactFullpage from "@fullpage/react-fullpage";
 import http from "@/lib/axios/http";
-import { setCurrentPost } from "@/lib/rtk/features/posts/postSlice";
+import { initiationPost, setCurrentPost } from "@/lib/rtk/features/posts/postSlice";
+import { useSearchParams } from "next/navigation";
 
 function Home_v2_pages() {
+  const dispatch = useDispatch();
+  const search = useSearchParams();
   const posts = useSelector((state) => state.posts);
   const auth = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
+  const arena = useSelector((state) => state.arena);
+
+  const currentArena = arena?.list?.find(
+    (item) => item?.name === arena?.current
+  );
 
   useEffect(() => {
     // panggil rebuild setelah data siap
@@ -20,6 +27,21 @@ function Home_v2_pages() {
       window.fullpage_api.reBuild();
     }
   }, []);
+
+  React.useEffect(() => {
+    if (posts?.initiation.length === 0)
+      http
+        .get(`/posts`, {
+          params: { arena_id: currentArena?.id, slug: search.get("slug") },
+        })
+        .then((res) => {
+          dispatch(initiationPost(res.data));
+
+          http
+            .get(`/posts/${res?.data?.[0]?.id}`)
+            .then((result) => dispatch(setCurrentPost(result?.data)));
+        });
+  }, [arena?.current, posts?.initiation]);
 
   useEffect(() => {
     if (list.length !== 0)
