@@ -9,6 +9,7 @@ const initialState = {
   pause: false,
   playing: false,
   openComment: false,
+  shouldNext: false
 };
 
 // Slice definition
@@ -52,6 +53,9 @@ export const postsSlice = createAppSlice({
     setOpenComment: create.reducer((state, action) => {
       state.openComment = action.payload;
     }),
+    setShouldNext: create.reducer((state, action) => {
+      state.shouldNext = action.payload;
+    }),
   }),
 });
 
@@ -67,4 +71,5 @@ export const {
   setPauseVideo,
   setPlayVideo,
   setOpenComment,
+  setShouldNext,
 } = postsSlice.actions;

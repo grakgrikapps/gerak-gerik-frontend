@@ -41,7 +41,9 @@ function Top_bar() {
           <Grid>
             <Link href="/profile">
               <IconButton size="small">
-                <Avatar sizes="small" src={profile?.photo ?? null} />
+                {profile?.photo && (
+                  <Avatar sizes="small" src={profile?.photo ?? ""} />
+                )}
               </IconButton>
             </Link>
           </Grid>
