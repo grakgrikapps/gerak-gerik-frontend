@@ -11,6 +11,7 @@ import {
   setCurrentPost,
   setOpenComment,
   setPauseVideo,
+  setShouldNext,
 } from "@/lib/rtk/features/posts/postSlice";
 import { motion } from "framer-motion";
 import moment from "moment";
@@ -118,8 +119,11 @@ function PickCard({
         setAlreadyVote(true);
 
         setTimeout(() => {
-          dispatch(setOpenComment(true));
-        }, 100);
+          if (posts?.current?.id === cardList[activeIndex]?.id) {
+            dispatch(setOpenComment(true));
+            dispatch(setShouldNext(true));
+          }
+        }, 3000);
       }
 
       // activeScroll();
@@ -176,7 +180,7 @@ function PickCard({
   }, [cardList]);
 
   useEffect(() => {
-    if (activeIndex >= 0)
+    if (activeIndex >= 0 && cardList[activeIndex]?.id)
       http.get(`/posts/${cardList[activeIndex]?.id}`).then((res) => {
         setDetail(res?.data);
       });

@@ -16,8 +16,10 @@ import http from "@/lib/axios/http";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setCurrentAddToBookmark,
+  setCurrentPost,
   setCurrentRemoveToBookmark,
   setOpenComment,
+  setShouldNext,
 } from "@/lib/rtk/features/posts/postSlice";
 
 function Bottom_bar() {
@@ -122,6 +124,21 @@ function Bottom_bar() {
         handleClose={() => {
           setSelected("Home");
           dispatch(setOpenComment(false));
+
+          if (posts.shouldNext) {
+            http
+              .get(
+                `/posts/${
+                  posts?.initiation?.[posts?.initiation?.length - 1].id
+                }`
+              )
+              .then((result) => {
+                dispatch(setCurrentPost(result?.data));
+                dispatch(setShouldNext(false));
+
+                window.fullpage_api.moveSectionDown();
+              });
+          }
         }}
       />
 

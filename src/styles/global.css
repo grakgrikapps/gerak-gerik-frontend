@@ -84,3 +84,7 @@ section {
 .fp-table {
   justify-content: flex-start !important;
 }
+
+.no-scrolling {
+  overflow: hidden !important;
+}
