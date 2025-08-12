@@ -6,6 +6,10 @@ import Box from "@mui/material/Box";
 import Bottom_bar from "../shared/bar/bottom.bar";
 import Top_bar from "../shared/bar/top.bar";
 
+import moment from "moment";
+import "moment/locale/id";
+moment.locale("id");
+
 function Main_layout({ children }) {
   return (
     <Grid
@@ -33,9 +37,7 @@ function Main_layout({ children }) {
           {/* Main content area */}
           <Box
             sx={{
-              height: "calc(100dvh)",
-              overflow: "auto",
-              "&::-webkit-scrollbar": { display: "none" },
+              height: "100dvh",
             }}
           >
             {children}

@@ -1,15 +1,19 @@
 import { createAppSlice } from "@/lib/rtk/createAppSlice";
+import { getYouTubeIdFromEmbedUrl } from "@/utils/helper";
 
 // Initial state
 const initialState = {
-  initiation: [],
+  // V2
+  list: [],
   current: null,
-  comments: [],
-  replies: {},
-  pause: false,
-  playing: false,
-  openComment: false,
-  shouldNext: false
+  content: {
+    type: null,
+    value: null,
+    thumbnail: null,
+    status: "empty", // 'empty', 'idle', 'loading', 'playing', 'loading', 'error
+  },
+  vote: null, // grak, grik
+  status: "loading", // 'empty', 'idle', 'loading', 'playing', 'loading', 'error
 };
 
 // Slice definition
@@ -17,59 +21,104 @@ export const postsSlice = createAppSlice({
   name: "posts",
   initialState,
   reducers: (create) => ({
-    initiationPost: create.reducer((state, action) => {
-      state.initiation = action.payload;
+    // initiationPost: create.reducer((state, action) => {
+    //   state.initiation = action.payload;
+    // }),
+    setListPost: create.reducer((state, action) => {
+      state.list = action.payload;
     }),
     setCurrentPost: create.reducer((state, action) => {
       state.current = action.payload;
     }),
-    setPauseVideo: create.reducer((state, action) => {
-      state.pause = action.payload;
+    setStatusPost: create.reducer((state, action) => {
+      state.status = action.payload;
     }),
-    setPlayVideo: create.reducer((state, action) => {
-      state.playing = action.payload;
-    }),
-    setCurrentAddToBookmark: create.reducer((state, action) => {
-      state.current = {
-        ...state.current,
-        bookmarks: [{ profile_id: action.payload }],
+    setPauseContent: create.reducer((state, action) => {
+      state.content = {
+        ...state.content,
+        status: "pause",
       };
     }),
-    setCurrentRemoveToBookmark: create.reducer((state) => {
-      state.current = { ...state.current, bookmarks: [] };
-    }),
-    setComment: create.reducer((state, action) => {
-      state.comments = action.payload;
-    }),
-    setCommentReplies: create.reducer((state, action) => {
-      state.replies = {
-        ...state.replies,
-        [action.payload.id]: action.payload.replies,
+    setPlayContent: create.reducer((state, action) => {
+      state.content = {
+        ...state.content,
+        status: "playing",
       };
     }),
-    clearCommentReplies: create.reducer((state) => {
-      state.replies = {};
+    setIdleContent: create.reducer((state, action) => {
+      state.content = {
+        ...state.content,
+        status: "idle",
+      };
     }),
-    setOpenComment: create.reducer((state, action) => {
-      state.openComment = action.payload;
+
+    setInitiationPost: create.reducer((state, action) => {
+      state.list = action.payload.list;
+      state.current = action.payload.current;
+      state.status = action.payload.status;
+      state.content = {
+        type: "youtube",
+        value: action.payload.current?.videos?.[0]?.url,
+        thumbnail: `https://i.ytimg.com/vi/${getYouTubeIdFromEmbedUrl(
+          action.payload.current?.videos?.[0]?.url
+        )}/maxresdefault.jpg`,
+        status: "idle",
+      };
     }),
-    setShouldNext: create.reducer((state, action) => {
-      state.shouldNext = action.payload;
-    }),
+
+    // setPauseVideo: create.reducer((state, action) => {
+    //   state.pause = action.payload;
+    // }),
+    // setPlayVideo: create.reducer((state, action) => {
+    //   state.playing = action.payload;
+    // }),
+    // setCurrentAddToBookmark: create.reducer((state, action) => {
+    //   state.current = {
+    //     ...state.current,
+    //     bookmarks: [{ profile_id: action.payload }],
+    //   };
+    // }),
+    // setCurrentRemoveToBookmark: create.reducer((state) => {
+    //   state.current = { ...state.current, bookmarks: [] };
+    // }),
+    // setComment: create.reducer((state, action) => {
+    //   state.comments = action.payload;
+    // }),
+    // setCommentReplies: create.reducer((state, action) => {
+    //   state.replies = {
+    //     ...state.replies,
+    //     [action.payload.id]: action.payload.replies,
+    //   };
+    // }),
+    // clearCommentReplies: create.reducer((state) => {
+    //   state.replies = {};
+    // }),
+    // setOpenComment: create.reducer((state, action) => {
+    //   state.openComment = action.payload;
+    // }),
+    // setShouldNext: create.reducer((state, action) => {
+    //   state.shouldNext = action.payload;
+    // }),
   }),
 });
 
 // Action creators
 export const {
-  initiationPost,
+  // initiationPost,
   setCurrentPost,
-  setComment,
-  setCommentReplies,
-  clearCommentReplies,
-  setCurrentAddToBookmark,
-  setCurrentRemoveToBookmark,
-  setPauseVideo,
-  setPlayVideo,
-  setOpenComment,
-  setShouldNext,
+  setListPost,
+  setStatusPost,
+  setInitiationPost,
+  setPauseContent,
+  setPlayContent,
+  setIdleContent,
+  // setComment,
+  // setCommentReplies,
+  // clearCommentReplies,
+  // setCurrentAddToBookmark,
+  // setCurrentRemoveToBookmark,
+  // setPauseVideo,
+  // setPlayVideo,
+  // setOpenComment,
+  // setShouldNext,
 } = postsSlice.actions;

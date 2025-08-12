@@ -50,10 +50,6 @@ function Bottom_bar() {
     }
   };
 
-  useEffect(() => {
-    dispatch(setOpenComment(false));
-  }, []);
-
   return (
     <Box
       height="65px"

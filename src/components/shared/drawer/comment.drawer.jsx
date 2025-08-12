@@ -5,7 +5,7 @@ import {
   setComment,
   setCommentReplies,
   clearCommentReplies,
-  setPauseVideo,
+  // setPauseVideo,
 } from "@/lib/rtk/features/posts/postSlice";
 import {
   Box,
@@ -130,24 +130,24 @@ function Comment_drawer(props) {
 
   React.useEffect(() => {
     if (props.open) {
-      dispatch(setPauseVideo(true));
+      // dispatch(setPauseVideo(true));
       setIsLoading(true); // mulai loading
-      http
-        .get(`/comments?post_id=${postId}`)
-        .then((res) => {
-          dispatch(setComment(res?.data ?? []));
-          dispatch(clearCommentReplies());
-        })
-        .catch((err) => {
-          console.error("Gagal fetch komentar:", err);
-        })
-        .finally(() => {
-          setIsLoading(false); // selesai loading
-        });
+      // http
+      //   .get(`/comments?post_id=${postId}`)
+      //   .then((res) => {
+      //     dispatch(setComment(res?.data ?? []));
+      //     dispatch(clearCommentReplies());
+      //   })
+      //   .catch((err) => {
+      //     console.error("Gagal fetch komentar:", err);
+      //   })
+      //   .finally(() => {
+      //     setIsLoading(false); // selesai loading
+      //   });
     } else {
       setTimeout(() => {
-        dispatch(setComment([]));
-        dispatch(clearCommentReplies());
+        // dispatch(setComment([]));
+        // dispatch(clearCommentReplies());
       }, 200);
     }
   }, [props?.open]);
@@ -220,7 +220,7 @@ function Comment_drawer(props) {
                   </Grid>
                 </Box>
               ))
-            ) : posts?.comments.length === 0 ? (
+            ) : posts?.comments?.length === 0 ? (
               <Box
                 display="flex"
                 flexDirection="column"

@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setCurrentPost,
   setOpenComment,
-  setPauseVideo,
+  // setPauseVideo,
   setShouldNext,
 } from "@/lib/rtk/features/posts/postSlice";
 import { motion } from "framer-motion";
@@ -93,7 +93,7 @@ function PickCard({
 
     if (isSelect) {
       setActiveIndex((prev) => prev - 1);
-      dispatch(setPauseVideo(false));
+      // dispatch(setPauseVideo(false));
     }
 
     setTimeout(async () => {
@@ -189,7 +189,7 @@ function PickCard({
   useEffect(() => {
     if (active) {
       setIsPlaying(true);
-      dispatch(setPauseVideo(false));
+      // dispatch(setPauseVideo(false));
     }
   }, [active]);
 
@@ -337,9 +337,9 @@ function PickCard({
                 })}
                 onClick={() => {
                   if (isPlaying) {
-                    dispatch(setPauseVideo(true));
+                    // dispatch(setPauseVideo(true));
                   } else {
-                    dispatch(setPauseVideo(false));
+                    // dispatch(setPauseVideo(false));
                   }
                 }}
               >
