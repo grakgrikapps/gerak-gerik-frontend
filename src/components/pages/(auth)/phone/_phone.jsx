@@ -41,7 +41,7 @@ function Phone_page() {
 
         router.push("/birthdate");
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
   });

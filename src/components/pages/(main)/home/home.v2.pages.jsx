@@ -18,6 +18,7 @@ import {
   setPauseContent,
   setPlayContent,
   setIdleContent,
+  setCurrentPost,
 } from "@/lib/rtk/features/posts/postSlice";
 import ReactPlayer from "react-player";
 import Link from "next/link";
@@ -52,14 +53,18 @@ function Home_v2_pages({ request, detail }) {
     }
   };
 
+  const handleChange = (props) => {
+    setActiveIndex(props.activeIndex);
+    dispatch(setIdleContent());
+
+    dispatch(setCurrentPost(posts?.list?.[props.activeIndex]));
+  };
+
   React.useEffect(() => {
     dispatch(
       setInitiationPost({ list: request, current: detail, status: "idle" })
     );
   }, []);
-
-  console.log(posts)
-  console.log(isMediaPause());
 
   return (
     <Container disableGutters maxWidth={false} sx={{ p: 0, m: 0 }}>
@@ -136,8 +141,7 @@ function Home_v2_pages({ request, detail }) {
             className="swiper-container-vertical"
             loop
             onActiveIndexChange={(props) => {
-              setActiveIndex(props.activeIndex);
-              dispatch(setIdleContent());
+              handleChange(props);
             }}
           >
             {posts?.list?.map((item, index) => {
