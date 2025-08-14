@@ -65,11 +65,6 @@ function Top_bar() {
       })
     );
 
-    if (selected === 0) {
-      router.push("/home");
-      return;
-    }
-
     router.push(`/home?arena_id=${selected}`);
   };
 
@@ -113,7 +108,7 @@ function Top_bar() {
                   })),
                 ].map((item) => (
                   <Button
-                    key={item}
+                    key={item.arena_id}
                     size="small"
                     color="inherit"
                     onClick={() => handleChangeArena(item?.arena_id)}

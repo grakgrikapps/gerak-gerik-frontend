@@ -49,7 +49,8 @@ function Home_v2_pages({ request, detail }) {
     dispatch(
       setInitiationPost({ list: request, current: detail, status: "idle" })
     );
-  }, []);
+    setActiveIndex(0);
+  }, [request]);
 
   return (
     <Container disableGutters maxWidth={false} sx={{ p: 0, m: 0 }}>

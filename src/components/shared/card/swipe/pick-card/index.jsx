@@ -210,7 +210,6 @@ function PickCard({ cardList = [], onEvaluate, active, current, index }) {
                 start: playedSeconds,
               },
             }}
-            muted
             onPlay={({ type }) => {
               if (type === "play") dispatch(setPlayContent());
             }}
@@ -284,7 +283,6 @@ function PickCard({ cardList = [], onEvaluate, active, current, index }) {
                         src={card}
                         playIcon={<PlayCircle />}
                         onProgress={handleProgress}
-                        muted
                       />
                     )}
 
