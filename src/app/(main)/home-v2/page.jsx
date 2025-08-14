@@ -1,6 +1,6 @@
 import React from "react";
 import http from "@/lib/axios/http-server";
-import Home_v2_pages from "@/components/pages/(main)/home/home.v2.pages";
+import Home_v2_pages from "@/components/pages/(main)/home/home.pages";
 
 async function Page() {
   const request = await http.get(`/posts?sort=viral`);

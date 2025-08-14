@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, IconButton, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 
@@ -16,14 +16,20 @@ import http from "@/lib/axios/http";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setCurrentAddToBookmark,
+  setCurrentPost,
   setCurrentRemoveToBookmark,
+  setOpenComment,
+  setPauseContent,
+  setShouldNext,
 } from "@/lib/rtk/features/posts/postSlice";
+import { setStatusComment } from "@/lib/rtk/features/comments/commentSlice";
 
 function Bottom_bar() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const posts = useSelector((state) => state.posts);
   const auth = useSelector((state) => state.auth);
+  const comment = useSelector((state) => state.comments);
+  const posts = useSelector((state) => state.posts);
 
   const [selected, setSelected] = React.useState("Home");
   const [showBookmarkDrawer, setShowBookmarkDrawer] = React.useState(false);
@@ -55,6 +61,7 @@ function Bottom_bar() {
       alignItems="flex-end"
       justifyContent="space-around"
       pb="5px"
+      position="relative"
     >
       {[
         {
@@ -98,6 +105,11 @@ function Bottom_bar() {
             if (item.label === "Save") {
               handleSave();
             }
+
+            if (item.label === "Comment") {
+              dispatch(setStatusComment("loading"));
+              dispatch(setPauseContent());
+            }
           }}
         >
           {item.icon}
@@ -107,12 +119,7 @@ function Bottom_bar() {
         </IconButton>
       ))}
 
-      <Comment_drawer
-        open={Boolean(selected === "Comment")}
-        handleClose={() => {
-          setSelected("Home");
-        }}
-      />
+      <Comment_drawer />
 
       <Replies_drawer />
 

@@ -24,13 +24,13 @@ function Top_bar() {
   const arena = useSelector((state) => state.arena);
 
   React.useEffect(() => {
-    http
-      .get("/auth/profile/arena")
-      .then((res) => dispatch(setMyArena(res.data)));
+    // http
+    //   .get("/auth/profile/arena")
+    //   .then((res) => dispatch(setMyArena(res.data)));
   }, []);
 
   return (
-    <Box>
+    <Box position="relative">
       <Container>
         <Grid
           container
@@ -41,7 +41,12 @@ function Top_bar() {
           <Grid>
             <Link href="/profile">
               <IconButton size="small">
-                <Avatar sizes="small" src={profile?.photo ?? null} />
+                <Avatar
+                  sizes="small"
+                  src={
+                    profile?.photo ?? "https://api.dicebear.com/9.x/dylan/svg"
+                  }
+                />
               </IconButton>
             </Link>
           </Grid>

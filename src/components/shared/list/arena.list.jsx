@@ -27,12 +27,12 @@ function Arena_list({ photo, name, slug, user_arenas, id, handleRefresh }) {
       mb="15px"
       alignItems="center"
     >
-      <Grid size={1}>
+      <Grid size={{ sm: 1, xs: 1.2 }}>
         <Link href={`/arena/${slug}`}>
           <Avatar src={photo} />
         </Link>
       </Grid>
-      <Grid size={8.2}>
+      <Grid size={{ sm: 8.2, xs: 7.5 }}>
         <Link href={`/arena/${slug}`}>
           <Box>
             <Typography variant="h6" fontWeight={500}>
@@ -44,7 +44,7 @@ function Arena_list({ photo, name, slug, user_arenas, id, handleRefresh }) {
           </Box>
         </Link>
       </Grid>
-      <Grid size={2}>
+      <Grid size={{sm: 2, xs: 2.5}}>
         <Chip
           variant={hasFollow ? "contained" : "outlined"}
           label={hasFollow ? "Unfollow" : "Follow"}
