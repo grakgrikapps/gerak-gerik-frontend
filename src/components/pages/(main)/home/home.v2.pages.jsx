@@ -27,10 +27,11 @@ import ArrowDownCircle from "@/components/shared/icons/arrow-up-circle";
 function Home_v2_pages({ request, detail }) {
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts);
-
+  
   const navigationPrevRef = React.useRef(null);
   const navigationNextRef = React.useRef(null);
-
+  
+  const [isSliding, setIsSliding] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState(0);
 
   const isMediaPause = () => {
@@ -52,7 +53,7 @@ function Home_v2_pages({ request, detail }) {
     );
   }, []);
 
-  console.log(posts?.content?.status)
+  console.log(isSliding)
 
   return (
     <Container disableGutters maxWidth={false} sx={{ p: 0, m: 0 }}>
@@ -87,6 +88,8 @@ function Home_v2_pages({ request, detail }) {
             noSwiping={true}
             noSwipingClass="pickcard-swipe"
             simulateTouch={false}
+            onSlideChangeTransitionStart={() => setIsSliding(true)}
+            onSlideChangeTransitionEnd={() => setIsSliding(false)}
           >
             {posts?.list?.map((item, index) => {
               return (
@@ -163,7 +166,7 @@ function Home_v2_pages({ request, detail }) {
               top: "calc(50% + 40px)", // 40px di bawah tombol pause
               left: "50%", // titik tengah horizontal
               transform: "translateX(-50%)", // geser ke kiri setengah lebar
-              display: isMediaPause() ? "flex" : "none",
+              display: !isSliding && isMediaPause() ? "flex" : "none",
               alignItems: "center",
               gap: "8px",
               zIndex: 10,
