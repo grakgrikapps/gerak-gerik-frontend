@@ -34,7 +34,7 @@ function Home_v2_pages({ request, detail }) {
   const [activeIndex, setActiveIndex] = React.useState(0);
 
   const isMediaPause = () => {
-    return ["empty", "error", "pause"].includes(
+    return ["empty", "error", "pause", 'idle'].includes(
       posts?.content?.status
     );
   };
@@ -51,6 +51,8 @@ function Home_v2_pages({ request, detail }) {
       setInitiationPost({ list: request, current: detail, status: "idle" })
     );
   }, []);
+
+  console.log(posts?.content?.status)
 
   return (
     <Container disableGutters maxWidth={false} sx={{ p: 0, m: 0 }}>

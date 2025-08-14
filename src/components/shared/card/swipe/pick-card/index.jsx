@@ -111,6 +111,8 @@ function PickCard({ cardList = [], onEvaluate, active }) {
       if (isSelect) {
         const selectedCard = cardList[cardList.length - 1];
         onEvaluate?.(selectedCard, isGood ? "good" : "bad");
+
+        dispatch(setPauseContent());
       }
 
       // activeScroll();
@@ -143,17 +145,16 @@ function PickCard({ cardList = [], onEvaluate, active }) {
     };
   }, [handleMove, handleEnd, isInteracting]);
 
-
   return (
     <>
-      <div className={styles.container} onClick={handleOnClick}>
+      <div className={styles.container}>
         {activeIndex < 0 && (
           <ReactPlayer
             height="100%"
             width="100%"
             loop
             playsInline
-            playing={isMediaPlaying() && active}
+            playing
             src={cardList?.[0]}
             light={`https://i.ytimg.com/vi/${getYouTubeIdFromEmbedUrl(
               cardList?.[0]
@@ -163,6 +164,9 @@ function PickCard({ cardList = [], onEvaluate, active }) {
               youtube: {
                 start: playedSeconds,
               },
+            }}
+            onPlay={({ type }) => {
+              if (type === "play") dispatch(setPlayContent());
             }}
           />
         )}
@@ -181,6 +185,7 @@ function PickCard({ cardList = [], onEvaluate, active }) {
                 onTouchStart: handleStart,
                 onMouseDown: handleStart,
               }}
+              onClick={handleOnClick}
             >
               <div className={styles.card_inner}>
                 <div className={styles.image_wrap}>
@@ -191,7 +196,7 @@ function PickCard({ cardList = [], onEvaluate, active }) {
                       loop
                       playsInline
                       ref={playerRef}
-                      playing={isMediaPlaying() && active && isActiveCard}
+                      playing={isMediaPlaying() && active}
                       src={card}
                       playIcon={<PlayCircle />}
                       onProgress={handleProgress}
