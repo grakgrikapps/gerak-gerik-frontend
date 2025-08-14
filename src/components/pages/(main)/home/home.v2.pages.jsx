@@ -11,14 +11,13 @@ import {
   CircularProgress,
   Avatar,
   Typography,
-  Tooltip,
+  Button,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setInitiationPost,
   setIdleContent,
   setCurrentPost,
-  setStatusPost,
 } from "@/lib/rtk/features/posts/postSlice";
 import Link from "next/link";
 import moment from "moment";
@@ -52,8 +51,6 @@ function Home_v2_pages({ request, detail }) {
     );
   }, []);
 
-  console.log("posts", posts?.list?.[activeIndex]);
-
   return (
     <Container disableGutters maxWidth={false} sx={{ p: 0, m: 0 }}>
       <Box sx={{ position: "relative" }}>
@@ -84,10 +81,17 @@ function Home_v2_pages({ request, detail }) {
           simulateTouch={false}
           onSlideChangeTransitionStart={() => setIsSliding(true)}
           onSlideChangeTransitionEnd={() => setIsSliding(false)}
+          enabled={!posts?.list?.[activeIndex]?.has_voted}
         >
           {posts?.status === "loading" && (
             <SwiperSlide>
               <Loading_Card />
+            </SwiperSlide>
+          )}
+
+          {posts?.status === "empty" && (
+            <SwiperSlide>
+              <Empty_Card />
             </SwiperSlide>
           )}
 
@@ -281,6 +285,45 @@ export const Loading_Card = () => {
             <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
           </Grid>
         </Grid>
+      </Box>
+    </Box>
+  );
+};
+
+export const Empty_Card = () => {
+  return (
+    <Box mt="10px" textAlign="center">
+      <Box
+        sx={{
+          position: "relative",
+          width: "100%",
+          height: "calc(100dvh - 50px)",
+          borderRadius: "10px",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Typography variant="h6" fontWeight="bold" color="text.secondary">
+          🎯 Arena Lagi Sepi Nih
+        </Typography>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          maxWidth="260px"
+          sx={{ mt: 1 }}
+        >
+          Gak ada yang beraksi sekarang... Jadi, mau kamu yang mulai bikin rame?
+          🚀
+        </Typography>
+
+        <Link href={`/post/create`}>
+          <Button variant="contained" size="small" sx={{ mt: 1, textTransform: 'capitalize'}}>
+            Buat Post
+          </Button>
+        </Link>
       </Box>
     </Box>
   );

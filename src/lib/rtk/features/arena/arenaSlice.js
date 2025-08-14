@@ -4,8 +4,8 @@ import { createAppSlice } from "@/lib/rtk/createAppSlice";
 const initialState = {
   list: [],
   following: [],
-  filter: { id: null, keyword: "" },
-  status: "empty", // 'empty', 'loading', 'playing', 'loading', 'error
+  filter: { id: 0, keyword: "" },
+  status: "empty", // 'empty', 'loading', 'playing', 'loading', 'error', 'idle'
 };
 
 // Slice definition
@@ -13,6 +13,13 @@ export const arenaSlice = createAppSlice({
   name: "arena",
   initialState,
   reducers: (create) => ({
+    setFollowingArena: create.reducer((state, action) => {
+      state.following = action.payload;
+      state.status = "idle";
+    }),
+    setSelectedArena: create.reducer((state, action) => {
+      state.filter.id = action.payload;
+    })
     // setArena: create.reducer((state, action) => {
     //   state.list = action.payload;
     // }),
@@ -23,4 +30,4 @@ export const arenaSlice = createAppSlice({
 });
 
 // Action creators
-export const {  } = arenaSlice.actions;
+export const { setFollowingArena, setSelectedArena } = arenaSlice.actions;

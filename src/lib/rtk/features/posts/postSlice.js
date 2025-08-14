@@ -61,7 +61,10 @@ export const postsSlice = createAppSlice({
     setInitiationPost: create.reducer((state, action) => {
       state.list = action.payload.list;
       state.current = action.payload.current;
-      state.status = action.payload.status;
+      state.status =
+        action.payload.list.length > 0
+          ? action.payload.status
+          : 'empty';
       state.content = {
         type: "youtube",
         value: action.payload.current?.videos?.[0]?.url,
@@ -75,6 +78,10 @@ export const postsSlice = createAppSlice({
     setHasVotePost: create.reducer((state, action) => {
       state.list[action.payload.index].has_voted = action.payload.hasVote;
     }),
+
+    setHasBookmark: create.reducer((state, action) => {
+      state.current.has_bookmark = action.payload;
+    })
 
     // setPauseVideo: create.reducer((state, action) => {
     //   state.pause = action.payload;
@@ -124,6 +131,7 @@ export const {
   setIdleContent,
   setDragingContent,
   setHasVotePost,
+  setHasBookmark,
   // setComment,
   // setCommentReplies,
   // clearCommentReplies,

@@ -4,7 +4,7 @@ import { createAppSlice } from "@/lib/rtk/createAppSlice";
 const initialState = {
   // V2
   list: [],
-  replies: [],
+  replies: {},
   value: "",
   status: "idle", // idle, loading, ready
 };
@@ -21,7 +21,7 @@ export const commentsSlice = createAppSlice({
       state.list = action.payload;
     }),
     setRepliesComment: create.reducer((state, action) => {
-      state.replies = action.payload;
+      state.replies[action.payload.id] = action.payload?.replies;
     }),
     setInitiationComment: create.reducer((state, action) => {
       state.list = action.payload.list;

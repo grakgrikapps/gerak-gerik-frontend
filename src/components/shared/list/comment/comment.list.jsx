@@ -10,7 +10,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import http from "@/lib/axios/http";
-import { setCommentReplies } from "@/lib/rtk/features/posts/postSlice";
+import { setRepliesComment } from "@/lib/rtk/features/comments/commentSlice";
 import moment from "moment";
 import React from "react";
 
@@ -38,7 +38,7 @@ function Comment_list(props) {
   const [loadingReply, setLoadingReply] = React.useState(false);
 
   const auth = useSelector((state) => state.auth);
-  const replies = useSelector((state) => state.posts.replies?.[props?.id]);
+  const replies = useSelector((state) => state.comments?.replies?.[props?.id]);
 
   const maxLength = 150;
   const userId = auth?.profile?.id;
@@ -97,7 +97,7 @@ function Comment_list(props) {
       const request = await http.get(`/comments/${props?.id}`);
 
       dispatch(
-        setCommentReplies({ id: props?.id, replies: request?.data?.replies })
+        setRepliesComment({ id: props?.id, replies: request?.data?.replies })
       );
 
       props.handleReplies(props?.id);

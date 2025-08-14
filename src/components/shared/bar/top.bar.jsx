@@ -12,22 +12,66 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
-import { setMyArena } from "@/lib/rtk/features/auth/authSlice";
-import { setCurrentArena } from "@/lib/rtk/features/arena/arenaSlice";
+import {
+  setFollowingArena,
+  setSelectedArena,
+} from "@/lib/rtk/features/arena/arenaSlice";
 import http from "@/lib/axios/http";
-import { initiationPost } from "@/lib/rtk/features/posts/postSlice";
+import {
+  setStatusPost,
+  setInitiationPost,
+} from "@/lib/rtk/features/posts/postSlice";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 function Top_bar() {
+  const router = useRouter();
+  const search = useSearchParams();
   const dispatch = useDispatch();
+
   const profile = useSelector((state) => state.auth.profile);
-  const myArena = useSelector((state) => state.auth.myArena);
   const arena = useSelector((state) => state.arena);
 
   React.useEffect(() => {
-    // http
-    //   .get("/auth/profile/arena")
-    //   .then((res) => dispatch(setMyArena(res.data)));
+    http.get("/auth/profile/arena").then((res) => {
+      dispatch(setFollowingArena(res?.data));
+    });
   }, []);
+
+  React.useEffect(() => {
+    if (search.get("arena_id")) {
+      dispatch(setSelectedArena(parseInt(search.get("arena_id"))));
+    } else {
+      dispatch(setSelectedArena(0));
+    }
+  }, [search.get("arena_id")]);
+
+  const handleChangeArena = async (selected) => {
+    dispatch(setSelectedArena(selected));
+    dispatch(setStatusPost("loading"));
+
+    const request = await http.get(`/posts`, {
+      params: {
+        sort: "viral",
+        arena_id: selected,
+      },
+    });
+
+    dispatch(
+      setInitiationPost({
+        list: request?.data,
+        current: request?.data?.[0],
+        status: request?.data?.length > 0 ? "idle" : "empty",
+      })
+    );
+
+    if (selected === 0) {
+      router.push("/home");
+      return;
+    }
+
+    router.push(`/home?arena_id=${selected}`);
+  };
 
   return (
     <Box position="relative">
@@ -51,7 +95,7 @@ function Top_bar() {
             </Link>
           </Grid>
 
-          <Grid size={{ xs: 9 }}>
+          <Grid size={{ xs: 10.5 }}>
             <Box
               mt={0.5}
               gap={2}
@@ -62,21 +106,24 @@ function Top_bar() {
             >
               {React.Children.toArray(
                 [
-                  "For You",
-                  ...(myArena ?? []).map((item) => item?.arena?.name),
+                  { name: "For You", arena_id: 0 },
+                  ...(arena?.following ?? []).map((item) => ({
+                    name: item?.arena?.name,
+                    arena_id: item?.arena_id,
+                  })),
                 ].map((item) => (
                   <Button
                     key={item}
                     size="small"
                     color="inherit"
-                    onClick={() => {
-                      dispatch(setCurrentArena(item));
-                      dispatch(initiationPost([]));
-                    }}
+                    onClick={() => handleChangeArena(item?.arena_id)}
                     sx={{
-                      fontWeight: item === arena.current ? 700 : 400,
+                      fontWeight:
+                        item?.arena_id === arena?.filter?.id ? 700 : 400,
                       borderBottom:
-                        item === arena.current ? "2px solid #000000" : "none",
+                        item?.arena_id === arena?.filter?.id
+                          ? "2px solid #000000"
+                          : "none",
                       borderRadius: 0,
                       minHeight: "0px",
                       minWidth: "fit-content",
@@ -84,18 +131,18 @@ function Top_bar() {
                       textTransform: "capitalize",
                     }}
                   >
-                    {item}
+                    {item?.name}
                   </Button>
                 ))
               )}
             </Box>
           </Grid>
 
-          <Grid size={{ xs: 1 }}>
+          {/* <Grid size={{ xs: 1 }}>
             <IconButton size="small">
               <SearchIcon color="#999DA3" />
             </IconButton>
-          </Grid>
+          </Grid> */}
         </Grid>
       </Container>
     </Box>

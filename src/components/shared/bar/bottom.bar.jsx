@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Box, IconButton, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 
@@ -14,39 +14,28 @@ import Bookmark_drawer from "../drawer/bookmark.drawer";
 import Share_drawer from "../drawer/share.drawer";
 import http from "@/lib/axios/http";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setCurrentAddToBookmark,
-  setCurrentPost,
-  setCurrentRemoveToBookmark,
-  setOpenComment,
-  setPauseContent,
-  setShouldNext,
-} from "@/lib/rtk/features/posts/postSlice";
+import { setPauseContent, setHasBookmark } from "@/lib/rtk/features/posts/postSlice";
 import { setStatusComment } from "@/lib/rtk/features/comments/commentSlice";
 
 function Bottom_bar() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const auth = useSelector((state) => state.auth);
-  const comment = useSelector((state) => state.comments);
   const posts = useSelector((state) => state.posts);
 
   const [selected, setSelected] = React.useState("Home");
   const [showBookmarkDrawer, setShowBookmarkDrawer] = React.useState(false);
 
-  const hasBookmark = posts?.current?.bookmarks?.find(
-    (item) => item.profile_id === auth?.profile?.id
-  );
+  const hasBookmark = posts?.current?.has_bookmark;
 
   const handleSave = async () => {
     try {
       if (hasBookmark) {
+        dispatch(setHasBookmark(false));
         await http.delete(`/bookmarks/${posts?.current?.id}`);
-        dispatch(setCurrentRemoveToBookmark());
       } else {
-        await http.get(`/bookmarks/${posts?.current?.id}`);
         setShowBookmarkDrawer(true);
-        dispatch(setCurrentAddToBookmark(auth?.profile?.id));
+        dispatch(setHasBookmark(true));
+        await http.get(`/bookmarks/${posts?.current?.id}`);
       }
     } catch (error) {
       console.error(error);

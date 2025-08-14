@@ -2,13 +2,9 @@ import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  setComment,
-  setCommentReplies,
-  // setPauseVideo,
-} from "@/lib/rtk/features/posts/postSlice";
-import {
   setInitiationComment,
   setListComment,
+  setRepliesComment,
   setStatusComment,
 } from "@/lib/rtk/features/comments/commentSlice";
 import {
@@ -88,15 +84,15 @@ function Comment_drawer(props) {
             ])
           );
         } else {
-          // dispatch(
-          //   setCommentReplies({
-          //     id: selectedReplies?.id,
-          //     replies: [
-          //       ...posts?.replies?.[selectedReplies?.id],
-          //       { ...tempComment, id: request?.data?.id },
-          //     ],
-          //   })
-          // );
+          dispatch(
+            setRepliesComment({
+              id: selectedReplies?.id,
+              replies: [
+                ...comment?.replies?.[selectedReplies?.id],
+                { ...tempComment, id: request?.data?.id },
+              ],
+            })
+          );
 
           // increment total comment
           dispatch(
@@ -120,7 +116,7 @@ function Comment_drawer(props) {
         // Optional: replace temp comment with actual from server if ID is important
       } catch (err) {
         dispatch(
-          setComment(comment?.list.filter((c) => c.id !== tempComment.id))
+          setListComment(comment?.list?.filter((c) => c.id !== tempComment.id))
         );
       } finally {
         setIsSending(false);
@@ -253,72 +249,6 @@ function Comment_drawer(props) {
                 </motion.div>
               ))}
 
-            {/* {comment.status === 'loading' ? (
-              // ⬅️ SKELETON LOADING
-              [...Array(3)].map((_, i) => (
-                <Box
-                  key={i}
-                  display="flex"
-                  flexDirection="column"
-                  gap={1}
-                  py={2}
-                >
-                  <Grid container justifyContent="space-between">
-                    <Grid size={1}>
-                      <Skeleton variant="circular" width={40} height={40} />
-                    </Grid>
-                    <Grid size={{ xs: 10.3, sm: 10.7 }}>
-                      <Skeleton
-                        variant="rectangular"
-                        height={20}
-                        width="80%"
-                        sx={{ mb: 1 }}
-                      />
-                      <Skeleton variant="rectangular" height={15} width="60%" />
-                    </Grid>
-                  </Grid>
-                </Box>
-              ))
-            ) : posts?.comments?.length === 0 ? (
-              <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                justifyContent="center"
-                py={6}
-                sx={{ opacity: 0.6 }}
-              >
-                <Typography variant="h4" fontWeight={500}>
-                  No comments yet
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Be the first to start the discussion.
-                </Typography>
-              </Box>
-            ) : (
-              posts?.comments?.map((item, key) => (
-                <motion.div
-                  key={item.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3, type: "spring" }}
-                >
-                  <Comment_list
-                    {...item}
-                    handleReplies={() => {
-                      formik.setFieldValue(
-                        "comment",
-                        `@${item?.profile?.username} `
-                      );
-                      setSelectedReplies(item);
-                      commentInput.current.focus();
-                    }}
-                  />
-                </motion.div>
-              ))
-            )} */}
           </AnimatePresence>
         </Box>
 
