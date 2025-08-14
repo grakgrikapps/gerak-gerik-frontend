@@ -27,6 +27,10 @@
   pointer-events: none;
   transform: translateY(20px) scale(0.97);
   transition: box-shadow 0.3s, transform 0.3s;
+  -webkit-transform: translateY(20px) scale(0.97);
+  -moz-transform: translateY(20px) scale(0.97);
+  -ms-transform: translateY(20px) scale(0.97);
+  -o-transform: translateY(20px) scale(0.97);
 }
 
 .card {

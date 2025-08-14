@@ -2,11 +2,17 @@ import { combineSlices, configureStore } from "@reduxjs/toolkit";
 import { postsSlice } from "./features/posts/postSlice";
 import { authSlice } from "./features/auth/authSlice";
 import { arenaSlice } from "./features/arena/arenaSlice";
+import { commentsSlice } from "./features/comments/commentSlice";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
 
 // Gabungkan slice
-const rootReducer = combineSlices(postsSlice, authSlice, arenaSlice);
+const rootReducer = combineSlices(
+  postsSlice,
+  authSlice,
+  arenaSlice,
+  commentsSlice
+);
 
 // Konfigurasi persist
 const persistConfig = {

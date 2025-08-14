@@ -1,21 +1,15 @@
-import React, { use, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./pick-card.module.scss";
 import { clamp, getYouTubeIdFromEmbedUrl } from "@/utils/helper";
-import http from "@/lib/axios/http";
-import ProgressMask from "../progress-mask";
-import { Avatar, Typography } from "@mui/material";
-import { Box, Grid } from "@mui/system";
-import ReactPlayer from "react-player";
-import { useDispatch, useSelector } from "react-redux";
 import {
-  setCurrentPost,
-  setOpenComment,
-  setPauseVideo,
-  setShouldNext,
+  setPauseContent,
+  setPlayContent,
 } from "@/lib/rtk/features/posts/postSlice";
-import { motion } from "framer-motion";
-import moment from "moment";
-import Link from "next/link";
+import ProgressMask from "../progress-mask";
+import { useDispatch, useSelector } from "react-redux";
+import ReactPlayer from "react-player";
+import PlayCircle from "@/components/shared/icons/play-circle";
+import { Loading_Card } from "@/components/pages/(main)/home/home.v2.pages";
 
 // Fungsi untuk mendapatkan posisi dari mouse/touch
 const getPosition = (event) => {
@@ -26,24 +20,20 @@ const getPosition = (event) => {
   }
 };
 
-function PickCard({
-  cardList = [],
-  onEvaluate,
-  active,
-  disableScroll,
-  activeScroll,
-}) {
+function PickCard({ cardList = [], onEvaluate, active }) {
   const interactionRef = useRef();
+  const playerRef = React.useRef(null);
   const dispatch = useDispatch();
+  const posts = useSelector((state) => state.posts);
+
   const [isInteracting, setIsInteracting] = useState(false);
   const [activeIndex, setActiveIndex] = useState(cardList.length - 1);
   const [progress, setProgress] = useState(0); // animation progress (-1 ~ 1)
-  const [calcWidth, setCalcWidth] = useState(0);
-  const [detail, setDetail] = useState({});
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [alreadyVote, setAlreadyVote] = useState(false); // 'horizontal' | 'vertical' | null
+  const [playedSeconds, setPlayedSeconds] = useState(0);
 
-  const posts = useSelector((state) => state.posts);
+  const handleProgress = (state) => {
+    setPlayedSeconds(state.timeStamp);
+  };
 
   const handleStart = useCallback((e) => {
     document.body.classList.add(styles.fix_container);
@@ -70,8 +60,11 @@ function PickCard({
     const dy = (y - interactionRef.current.y) * 0.5;
     const deg = (dx / 600) * -30;
 
-    $card.style.transform = `translate(${dx}px) rotate(${deg}deg)`;
-    disableScroll();
+    $card.style.transform = `translate(${dx}px, ${dy}px) rotate(${deg}deg)`;
+
+    if (isMediaPlaying()) {
+      // dispatch(setDragingContent());
+    }
 
     const newProgress = clamp(dx / 100, -1, 1);
     setProgress(newProgress);
@@ -83,52 +76,60 @@ function PickCard({
 
     const isSelect = Math.abs(progress) === 1;
     const isGood = progress === 1;
+    const [, currentXString] =
+      $card.style.transform.match(/translate\(([^,]+), [^)]+\)/) || [];
+    const [, currentYString] =
+      $card.style.transform.match(/translate\([^,]+, ([^)]+)\)/) || [];
+    const [, currentRotateString] =
+      $card.style.transform.match(/rotate\(([^)]+)\)/) || [];
+
+    const currentX = parseInt(currentXString, 10);
+    const currentY = parseInt(currentYString, 10);
+    const currentRotate = parseInt(currentRotateString, 10);
+    const dx = isGood
+      ? window.innerWidth
+      : (window.innerWidth + $card.getBoundingClientRect().width) * -1;
 
     $card.style.transition = "transform 0.3s ease-in-out";
-    $card.style.transform = isSelect ? `` : "translate(0, 0) rotate(0deg)";
+    $card.style.transform = isSelect
+      ? `translate(${currentX + dx}px, ${currentY}px) rotate(${
+          currentRotate * 2
+        }deg)`
+      : "translate(0, 0) rotate(0deg)";
 
     interactionRef.current = undefined;
+
     setIsInteracting(false);
     setProgress(0);
 
     if (isSelect) {
       setActiveIndex((prev) => prev - 1);
-      dispatch(setPauseVideo(false));
+      // dispatch(setPauseVideo(false));
     }
 
     setTimeout(async () => {
-      // document.body.classList.remove(styles.fix_container);
-
-      activeScroll();
       if (isSelect) {
         const selectedCard = cardList[cardList.length - 1];
         onEvaluate?.(selectedCard, isGood ? "good" : "bad");
 
-        if (isGood) {
-          await http.get(`/posts/upvote/${selectedCard?.id}`);
-        } else {
-          await http.get(`/posts/downvote/${selectedCard?.id}`);
-        }
-
-        if (activeIndex >= 0)
-          http.get(`/posts/${cardList[activeIndex]?.id}`).then((res) => {
-            setDetail(res?.data);
-            dispatch(setCurrentPost(res?.data));
-          });
-
-        setAlreadyVote(true);
-
-        setTimeout(() => {
-          if (posts?.current?.id === cardList[activeIndex]?.id) {
-            dispatch(setOpenComment(true));
-            dispatch(setShouldNext(true));
-          }
-        }, 3000);
+        dispatch(setPauseContent());
       }
 
       // activeScroll();
     }, 300);
-  }, [cardList, onEvaluate, progress]);
+  }, [onEvaluate, progress]);
+
+  const isMediaPlaying = () => {
+    return ["playing", "loading"].includes(posts?.content?.status);
+  };
+
+  const handleOnClick = () => {
+    if (isMediaPlaying()) {
+      dispatch(setPauseContent());
+    } else {
+      dispatch(setPlayContent());
+    }
+  };
 
   useEffect(() => {
     window.addEventListener("mousemove", handleMove);
@@ -144,268 +145,78 @@ function PickCard({
     };
   }, [handleMove, handleEnd, isInteracting]);
 
-  useEffect(() => {
-    const handleResize = () => {
-      const newWindowDimensions = {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      };
-
-      const viewportHeight = newWindowDimensions.height;
-      const aspectRatio = 16 / 9;
-
-      if (newWindowDimensions.width < viewportHeight * aspectRatio) {
-        setCalcWidth(viewportHeight * aspectRatio);
-      } else {
-        setCalcWidth(newWindowDimensions.width);
-      }
-    };
-
-    // Initial setup
-    handleResize();
-
-    // Add event listener
-    window.addEventListener("resize", handleResize);
-
-    // Cleanup
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (cardList?.[0]?.id) {
-      setActiveIndex(cardList?.length - 1);
-    }
-  }, [cardList]);
-
-  useEffect(() => {
-    if (activeIndex >= 0 && cardList[activeIndex]?.id)
-      http.get(`/posts/${cardList[activeIndex]?.id}`).then((res) => {
-        setDetail(res?.data);
-      });
-  }, [activeIndex]);
-
-  useEffect(() => {
-    if (active) {
-      setIsPlaying(true);
-      dispatch(setPauseVideo(false));
-    }
-  }, [active]);
-
-  const upvotes = detail?.upvote?.length ?? 0;
-  const downvotes = detail?.downvote?.length ?? 0;
-  const totalVotes = upvotes + downvotes;
-
-  const upvotePercentage = totalVotes > 0 ? (upvotes / totalVotes) * 100 : 0;
-  const downvotePercentage = 100 - upvotePercentage;
-
   return (
     <>
       <div className={styles.container}>
-        {/* <PickCardResult /> */}
-
-        {totalVotes > 0 && alreadyVote && (
-          <>
-            {/* Left vertical progress */}
-            <Box
-              sx={{
-                position: "absolute",
-                left: "0px",
-                top: "30px",
-                height: "calc(100dvh - 350px)",
-                display: isInteracting ? "none" : "flex",
-                alignItems: "flex-start",
-                zIndex: 110,
-              }}
-            >
-              <Box sx={{ position: "relative", width: "8px" }}>
-                {/* Background bar */}
-                <Box
-                  sx={{
-                    width: "8px",
-                    height: "calc(100dvh - 350px)",
-                    // backgroundColor: "#e0e0e0",
-                    borderRadius: "8px",
-                    position: "relative",
-                    overflow: "hidden",
-                  }}
-                >
-                  {/* Progress fill */}
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      bottom: 0,
-                      width: "100%",
-                      height: `${downvotePercentage}%`,
-                      backgroundImage:
-                        "linear-gradient(to top, #D00D3F, #94001B)",
-                      borderRadius: "8px",
-                      transition: "height 0.3s ease-in-out",
-                    }}
-                  />
-                </Box>
-
-                {/* Label */}
-                <Typography
-                  sx={{
-                    position: "absolute",
-                    top: `${100 - downvotePercentage}%`,
-                    left: "12px",
-                    color: "#fff",
-                    fontSize: "10px",
-                  }}
-                >
-                  {Math.round(downvotePercentage)}%
-                </Typography>
-              </Box>
-            </Box>
-
-            {/* Right vertical progress */}
-            <Box
-              sx={{
-                position: "absolute",
-                right: "0px",
-                top: "30px",
-                height: "calc(100dvh - 350px)",
-                display: isInteracting ? "none" : "flex",
-                alignItems: "flex-end",
-                zIndex: 110,
-              }}
-            >
-              <Box sx={{ position: "relative", width: "8px" }}>
-                {/* Background bar */}
-                <Box
-                  sx={{
-                    width: "8px",
-                    height: "calc(100dvh - 350px)",
-                    borderRadius: "8px",
-                    position: "relative",
-                    overflow: "hidden",
-                  }}
-                >
-                  {/* Progress fill */}
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      bottom: 0,
-                      width: "100%",
-                      height: `${upvotePercentage}%`,
-                      backgroundImage:
-                        "linear-gradient(to top, #4177FC, #2D67F6)",
-                      borderRadius: "8px",
-                      transition: "height 0.3s ease-in-out",
-                    }}
-                  />
-                </Box>
-
-                {/* Label */}
-                <Typography
-                  sx={{
-                    position: "absolute",
-                    top: `${100 - upvotePercentage}%`,
-                    right: "12px",
-                    color: "#fff",
-                    fontSize: "10px",
-                  }}
-                >
-                  {Math.round(upvotePercentage)}%
-                </Typography>
-              </Box>
-            </Box>
-          </>
+        {activeIndex < 0 && (
+          <ReactPlayer
+            height="100%"
+            width="100%"
+            loop
+            playsInline
+            playing
+            src={cardList?.[0]}
+            light={`https://i.ytimg.com/vi/${getYouTubeIdFromEmbedUrl(
+              cardList?.[0]
+            )}/maxresdefault.jpg`}
+            playIcon={<PlayCircle />}
+            config={{
+              youtube: {
+                start: playedSeconds,
+              },
+            }}
+            onPlay={({ type }) => {
+              if (type === "play") dispatch(setPlayContent());
+            }}
+          />
         )}
 
-        {active &&
-          cardList.map((card, index) => {
-            const isActiveCard = index >= activeIndex;
-            const isLastCard = index === cardList.length - 1;
+        {cardList.map((card, index) => {
+          const isActiveCard = index >= activeIndex;
+          const isLastCard = index === cardList.length - 1;
 
-            return (
-              <motion.div
-                key={index}
-                className={[styles.card, isActiveCard && styles.active]
-                  .filter(Boolean)
-                  .join(" ")}
-                initial={active ? { opacity: 0, scale: 0.9 } : false} // ⬅️ animasi masuk
-                animate={active ? { opacity: 1, scale: 1 } : {}} // ⬅️ animasi aktif
-                exit={{ opacity: 0, scale: 0.95 }} // ⬅️ animasi keluar
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                {...(isLastCard && {
-                  onTouchStart: handleStart,
-                  onMouseDown: handleStart,
-                })}
-                onClick={() => {
-                  if (isPlaying) {
-                    dispatch(setPauseVideo(true));
-                  } else {
-                    dispatch(setPauseVideo(false));
-                  }
-                }}
-              >
-                <div className={styles.card_inner}>
-                  <div className={styles.image_wrap}>
+          return (
+            <div
+              key={index}
+              className={[styles.card, isActiveCard && styles.active]
+                .filter(Boolean)
+                .join(" ")}
+              {...{
+                onTouchStart: handleStart,
+                onMouseDown: handleStart,
+              }}
+              onClick={handleOnClick}
+            >
+              <div className={styles.card_inner}>
+                <div className={styles.image_wrap}>
+                  {activeIndex >= 0 && (
                     <ReactPlayer
                       height="100%"
                       width="100%"
                       loop
-                      playing={!posts?.pause}
                       playsInline
-                      // muted
-                      onPlaying={() =>
-                        setTimeout(() => {
-                          setIsPlaying(true);
-                        }, 100)
-                      }
-                      onPause={() => setIsPlaying(false)}
-                      // light={`https://img.youtube.com/vi/${getYouTubeIdFromEmbedUrl(
-                      //   card?.videos?.[0]?.url ?? ""
-                      // )}/0.jpg`}
-                      src={card?.videos?.[0]?.url}
+                      ref={playerRef}
+                      playing={isMediaPlaying() && active}
+                      src={card}
+                      playIcon={<PlayCircle />}
+                      onProgress={handleProgress}
                     />
-                  </div>
+                  )}
 
+                  {!active && <Loading_Card />}
+                </div>
+
+                {isLastCard && (
                   <ProgressMask
                     progress={progress}
                     isInteracting={isInteracting}
                   />
-                </div>
-              </motion.div>
-            );
-          })}
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
-
-      <Box px="5%" pt="15px">
-        <Grid container justifyContent="space-between">
-          <Grid size={1}>
-            <Link href={`/profile/${detail?.profile?.username}`}>
-              <Avatar src={detail?.profile?.photo} />
-            </Link>
-          </Grid>
-          <Grid size={{ xs: 10.2, sm: 10.5 }}>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Box display="flex" alignItems="center" gap="5px">
-                <Typography variant="h5">
-                  {detail?.profile?.fullname}
-                </Typography>
-                <Typography variant="body2" color="#959595" fontSize="10px">
-                  @{detail?.profile?.username}
-                </Typography>
-              </Box>
-
-              <Typography color="#959595">
-                {moment(detail?.createdAt).fromNow()}
-              </Typography>
-            </Box>
-
-            <Typography>{detail?.description}</Typography>
-          </Grid>
-        </Grid>
-      </Box>
     </>
   );
 }

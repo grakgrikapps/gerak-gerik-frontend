@@ -32,7 +32,7 @@ function ProgressMask({ progress, isInteracting }) {
         .filter(Boolean)
         .join(" ")}
       style={{
-        opacity: Math.abs(progress) * 0.95,
+        opacity: 100,
         transition: isInteracting ? "" : "opacity 0.3s linear",
       }}
     >

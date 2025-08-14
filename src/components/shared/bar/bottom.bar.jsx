@@ -19,14 +19,17 @@ import {
   setCurrentPost,
   setCurrentRemoveToBookmark,
   setOpenComment,
+  setPauseContent,
   setShouldNext,
 } from "@/lib/rtk/features/posts/postSlice";
+import { setStatusComment } from "@/lib/rtk/features/comments/commentSlice";
 
 function Bottom_bar() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const posts = useSelector((state) => state.posts);
   const auth = useSelector((state) => state.auth);
+  const comment = useSelector((state) => state.comments);
+  const posts = useSelector((state) => state.posts);
 
   const [selected, setSelected] = React.useState("Home");
   const [showBookmarkDrawer, setShowBookmarkDrawer] = React.useState(false);
@@ -49,10 +52,6 @@ function Bottom_bar() {
       console.error(error);
     }
   };
-
-  useEffect(() => {
-    dispatch(setOpenComment(false));
-  }, []);
 
   return (
     <Box
@@ -108,7 +107,8 @@ function Bottom_bar() {
             }
 
             if (item.label === "Comment") {
-              dispatch(setOpenComment(true));
+              dispatch(setStatusComment("loading"));
+              dispatch(setPauseContent());
             }
           }}
         >
@@ -119,28 +119,7 @@ function Bottom_bar() {
         </IconButton>
       ))}
 
-      <Comment_drawer
-        open={posts?.openComment}
-        handleClose={() => {
-          setSelected("Home");
-          dispatch(setOpenComment(false));
-
-          if (posts.shouldNext) {
-            http
-              .get(
-                `/posts/${
-                  posts?.initiation?.[posts?.initiation?.length - 1].id
-                }`
-              )
-              .then((result) => {
-                dispatch(setCurrentPost(result?.data));
-                dispatch(setShouldNext(false));
-
-                window.fullpage_api.moveSectionDown();
-              });
-          }
-        }}
-      />
+      <Comment_drawer />
 
       <Replies_drawer />
 
