@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Avatar,
   Typography,
+  Tooltip,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -50,6 +51,8 @@ function Home_v2_pages({ request, detail }) {
       setInitiationPost({ list: request, current: detail, status: "idle" })
     );
   }, []);
+
+  console.log("posts", posts?.list?.[activeIndex]);
 
   return (
     <Container disableGutters maxWidth={false} sx={{ p: 0, m: 0 }}>
@@ -197,13 +200,24 @@ function Home_v2_pages({ request, detail }) {
           <div
             ref={navigationNextRef}
             style={{
-              pointerEvents:
-                activeIndex === posts?.list?.length - 1 ? "none" : "auto",
+              // pointerEvents:
+              //   activeIndex === posts?.list?.length - 1 ||
+              //   !posts?.list?.[activeIndex]?.has_voted
+              //     ? "none"
+              //     : "auto",
               cursor:
-                activeIndex === posts?.list?.length - 1 ? "default" : "pointer",
-              opacity: activeIndex === posts?.list?.length - 1 ? 0.3 : 1,
+                activeIndex === posts?.list?.length - 1 ||
+                !posts?.list?.[activeIndex]?.has_voted
+                  ? "default"
+                  : "pointer",
+              opacity:
+                activeIndex === posts?.list?.length - 1 ||
+                !posts?.list?.[activeIndex]?.has_voted
+                  ? 0.3
+                  : 1,
               transform:
-                activeIndex === posts?.list?.length - 1
+                activeIndex === posts?.list?.length - 1 ||
+                !posts?.list?.[activeIndex]?.has_voted
                   ? "scale(0.9)"
                   : "scale(1)",
               transition: "opacity 0.3s ease, transform 0.3s ease",
@@ -212,7 +226,10 @@ function Home_v2_pages({ request, detail }) {
           >
             <ArrowDownCircle
               color={
-                activeIndex === posts?.list?.length - 1 ? "#cccccc" : "#ffffff"
+                activeIndex === posts?.list?.length - 1 ||
+                !posts?.list?.[activeIndex]?.has_voted
+                  ? "#cccccc"
+                  : "#ffffff"
               }
             />
           </div>

@@ -5,6 +5,7 @@ import {
   setPauseContent,
   setPlayContent,
   setDragingContent,
+  setHasVotePost,
 } from "@/lib/rtk/features/posts/postSlice";
 import ProgressMask from "../progress-mask";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,7 +23,7 @@ const getPosition = (event) => {
   }
 };
 
-function PickCard({ cardList = [], onEvaluate, active, current }) {
+function PickCard({ cardList = [], onEvaluate, active, current, index }) {
   const interactionRef = useRef();
   const playerRef = React.useRef(null);
   const dispatch = useDispatch();
@@ -117,6 +118,8 @@ function PickCard({ cardList = [], onEvaluate, active, current }) {
         const prevUpvote = currentCard?.upvote || [];
         const prevDownvote = currentCard?.downvote || [];
 
+        dispatch(setHasVotePost({ index, hasVote: true }));
+
         // Update lokal langsung
         setCurrentCard((prev) => {
           if (!prev) return prev;
@@ -139,6 +142,8 @@ function PickCard({ cardList = [], onEvaluate, active, current }) {
           }
         } catch (err) {
           console.error("Vote gagal, rollback...", err);
+          dispatch(setHasVotePost({ index, hasVote: false }));
+
           // Rollback ke nilai lama
           setCurrentCard((prev) => ({
             ...prev,
@@ -248,13 +253,13 @@ function PickCard({ cardList = [], onEvaluate, active, current }) {
         )}
 
         {!posts?.current?.has_voted &&
-          cardList.map((card, index) => {
-            const isActiveCard = index >= activeIndex;
-            const isLastCard = index === cardList.length - 1;
+          cardList.map((card, key) => {
+            const isActiveCard = key >= activeIndex;
+            const isLastCard = key === cardList.length - 1;
 
             return (
               <div
-                key={index}
+                key={key}
                 className={[styles.card, isActiveCard && styles.active]
                   .filter(Boolean)
                   .join(" ")}

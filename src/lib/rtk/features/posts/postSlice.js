@@ -72,6 +72,10 @@ export const postsSlice = createAppSlice({
       };
     }),
 
+    setHasVotePost: create.reducer((state, action) => {
+      state.list[action.payload.index].has_voted = action.payload.hasVote;
+    }),
+
     // setPauseVideo: create.reducer((state, action) => {
     //   state.pause = action.payload;
     // }),
@@ -119,6 +123,7 @@ export const {
   setPlayContent,
   setIdleContent,
   setDragingContent,
+  setHasVotePost,
   // setComment,
   // setCommentReplies,
   // clearCommentReplies,
