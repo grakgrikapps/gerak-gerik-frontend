@@ -200,11 +200,11 @@ function Home_v2_pages({ request, detail }) {
           <div
             ref={navigationNextRef}
             style={{
-              // pointerEvents:
-              //   activeIndex === posts?.list?.length - 1 ||
-              //   !posts?.list?.[activeIndex]?.has_voted
-              //     ? "none"
-              //     : "auto",
+              pointerEvents:
+                activeIndex === posts?.list?.length - 1 ||
+                !posts?.list?.[activeIndex]?.has_voted
+                  ? "none"
+                  : "auto",
               cursor:
                 activeIndex === posts?.list?.length - 1 ||
                 !posts?.list?.[activeIndex]?.has_voted
