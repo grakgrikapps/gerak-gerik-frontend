@@ -77,7 +77,7 @@ function ProgressMask({ progress, isInteracting }) {
           </div>
         </div>
 
-        <span className={styles.label}>Grak</span>
+        <span className={styles.label}>{isGood ? "Grak" : "Grik"}</span>
       </div>
     </div>
   );
