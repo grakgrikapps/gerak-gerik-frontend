@@ -4,7 +4,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { StoreProvider } from "./StoreProvider";
 import theme from "@/lib/mui/theme";
 import CssBaseline from "@mui/material/CssBaseline";
-import "@/styles/global.css"; // Ensure global styles are imported
+import "@/styles/global.scss"; // Ensure global styles are imported
 
 export default function RootLayout(props) {
   return (

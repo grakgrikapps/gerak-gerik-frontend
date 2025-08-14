@@ -133,13 +133,11 @@
     overflow: hidden;
   }
 
-  
-.image_wrap {
-  position: relative;
-  overflow: hidden;
-  height: calc(100dvh - 220px);
-}
-
+  .image_wrap {
+    position: relative;
+    overflow: hidden;
+    height: calc(100dvh - 220px);
+  }
 
   .button_wrap {
     display: flex;
@@ -176,3 +174,4 @@
     }
   }
 }
+

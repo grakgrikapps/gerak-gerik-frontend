@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ReactPlayer from "react-player";
 import PlayCircle from "@/components/shared/icons/play-circle";
 import { Loading_Card } from "@/components/pages/(main)/home/home.v2.pages";
+import http from "@/lib/axios/http";
 
 // Fungsi untuk mendapatkan posisi dari mouse/touch
 const getPosition = (event) => {
@@ -21,12 +22,14 @@ const getPosition = (event) => {
   }
 };
 
-function PickCard({ cardList = [], onEvaluate, active }) {
+function PickCard({ cardList = [], onEvaluate, active, current }) {
   const interactionRef = useRef();
   const playerRef = React.useRef(null);
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts);
+  const auth = useSelector((state) => state.auth);
 
+  const [currentCard, setCurrentCard] = useState(current);
   const [isInteracting, setIsInteracting] = useState(false);
   const [activeIndex, setActiveIndex] = useState(cardList.length - 1);
   const [progress, setProgress] = useState(0); // animation progress (-1 ~ 1)
@@ -103,13 +106,47 @@ function PickCard({ cardList = [], onEvaluate, active }) {
 
     if (isSelect) {
       setActiveIndex((prev) => prev - 1);
-      // dispatch(setPauseVideo(false));
     }
 
     setTimeout(async () => {
       if (isSelect) {
         const selectedCard = cardList[cardList.length - 1];
         onEvaluate?.(selectedCard, isGood ? "good" : "bad");
+
+        // === OPTIMISTIC UPDATE START ===
+        const prevUpvote = currentCard?.upvote || [];
+        const prevDownvote = currentCard?.downvote || [];
+
+        // Update lokal langsung
+        setCurrentCard((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            upvote: isGood ? [...prev.upvote, auth?.profile?.id] : prev.upvote,
+            downvote: !isGood
+              ? [...prev.downvote, auth?.profile?.id]
+              : prev.downvote,
+          };
+        });
+
+        dispatch(setPauseContent());
+
+        try {
+          if (isGood) {
+            await http.get(`/posts/upvote/${currentCard?.id}`);
+          } else {
+            await http.get(`/posts/downvote/${currentCard?.id}`);
+          }
+        } catch (err) {
+          console.error("Vote gagal, rollback...", err);
+          // Rollback ke nilai lama
+          setCurrentCard((prev) => ({
+            ...prev,
+            upvote: prevUpvote,
+            downvote: prevDownvote,
+          }));
+        }
+        // === OPTIMISTIC UPDATE END ===
       }
 
       // activeScroll();
@@ -124,7 +161,6 @@ function PickCard({ cardList = [], onEvaluate, active }) {
   };
 
   const handleOnClick = () => {
-    console.log("isMediaPlaying()", isMediaPlaying());
     if (isMediaPlaying()) {
       dispatch(setPauseContent());
     } else {
@@ -146,16 +182,22 @@ function PickCard({ cardList = [], onEvaluate, active }) {
     };
   }, [handleMove, handleEnd, isInteracting]);
 
+  const upvoteCount = currentCard?.upvote?.length || 0;
+  const downvoteCount = currentCard?.downvote?.length || 0;
+  const totalVotes = upvoteCount + downvoteCount;
+
+  // Hindari pembagian 0
+  const leftPercent = totalVotes > 0 ? (downvoteCount / totalVotes) * 100 : 0;
+  const rightPercent = totalVotes > 0 ? (upvoteCount / totalVotes) * 100 : 0;
+
   return (
     <>
       <div className={styles.container}>
-        {activeIndex < 0 && (
+        {(activeIndex < 0 || posts?.current?.has_voted) && (
           <ReactPlayer
             height="100%"
             width="100%"
             loop
-            playsInline
-            playing
             src={cardList?.[0]}
             playIcon={<PlayCircle />}
             config={{
@@ -163,59 +205,97 @@ function PickCard({ cardList = [], onEvaluate, active }) {
                 start: playedSeconds,
               },
             }}
+            muted
             onPlay={({ type }) => {
               if (type === "play") dispatch(setPlayContent());
+            }}
+            onPause={({ type }) => {
+              if (type === "pause") dispatch(setPauseContent());
             }}
           />
         )}
 
-        {cardList.map((card, index) => {
-          const isActiveCard = index >= activeIndex;
-          const isLastCard = index === cardList.length - 1;
-
-          return (
-            <div
-              key={index}
-              className={[styles.card, isActiveCard && styles.active]
-                .filter(Boolean)
-                .join(" ")}
-              {...{
-                onTouchStart: handleStart,
-                onMouseDown: handleStart,
-              }}
-              onClick={() => {
-                if (isLastCard) handleOnClick();
-              }}
-            >
-              <div className={styles.card_inner}>
-                <div className={styles.image_wrap}>
-                  {activeIndex >= 0 && (
-                    <ReactPlayer
-                      height="100%"
-                      width="100%"
-                      loop
-                      playsInline
-                      ref={playerRef}
-                      playing={isMediaPlaying() && active}
-                      src={card}
-                      playIcon={<PlayCircle />}
-                      onProgress={handleProgress}
-                    />
-                  )}
-
-                  {!active && <Loading_Card />}
-                </div>
-
-                {posts?.content?.status === "draging" && (
-                  <ProgressMask
-                    progress={progress}
-                    isInteracting={isInteracting}
-                  />
-                )}
+        {(activeIndex < 0 || posts?.current?.has_voted) && (
+          <>
+            {/* LEFT PROGRESS */}
+            <div className="vertical_bar left_bar">
+              <div
+                className="progress_left"
+                style={{ height: `${leftPercent * 0.8}%` }}
+              ></div>
+              <div
+                className="progress_label"
+                style={{ bottom: `${leftPercent * 0.8 - 2}%` }}
+              >
+                {Math.round(leftPercent)}%
               </div>
             </div>
-          );
-        })}
+
+            {/* RIGHT PROGRESS */}
+            <div className="vertical_bar right_bar">
+              <div
+                className="progress_right"
+                style={{ height: `${rightPercent * 0.8}%` }}
+              ></div>
+              <div
+                className="progress_label"
+                style={{ bottom: `${rightPercent * 0.8 - 2}%` }}
+              >
+                {Math.round(rightPercent)}%
+              </div>
+            </div>
+          </>
+        )}
+
+        {!posts?.current?.has_voted &&
+          cardList.map((card, index) => {
+            const isActiveCard = index >= activeIndex;
+            const isLastCard = index === cardList.length - 1;
+
+            return (
+              <div
+                key={index}
+                className={[styles.card, isActiveCard && styles.active]
+                  .filter(Boolean)
+                  .join(" ")}
+                {...{
+                  onTouchStart: handleStart,
+                  onMouseDown: handleStart,
+                }}
+                onClick={() => {
+                  if (isLastCard) handleOnClick();
+                }}
+              >
+                <div className={styles.card_inner}>
+                  <div className={styles.image_wrap}>
+                    {activeIndex >= 0 && (
+                      <ReactPlayer
+                        height="100%"
+                        width="100%"
+                        loop
+                        playsInline
+                        ref={playerRef}
+                        playing={isMediaPlaying() && active}
+                        src={card}
+                        playIcon={<PlayCircle />}
+                        onProgress={handleProgress}
+                        muted
+                      />
+                    )}
+
+                    {!active && <Loading_Card />}
+                  </div>
+
+                  {posts?.content?.status === "draging" && (
+                    <ProgressMask
+                      progress={progress}
+                      isInteracting={isInteracting}
+                    />
+                  )}
+                </div>
+              </div>
+            );
+          })}
       </div>
     </>
   );
