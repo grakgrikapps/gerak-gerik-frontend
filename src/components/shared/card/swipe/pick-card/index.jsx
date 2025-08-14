@@ -4,6 +4,7 @@ import { clamp, getYouTubeIdFromEmbedUrl } from "@/utils/helper";
 import {
   setPauseContent,
   setPlayContent,
+  setDragingContent,
 } from "@/lib/rtk/features/posts/postSlice";
 import ProgressMask from "../progress-mask";
 import { useDispatch, useSelector } from "react-redux";
@@ -62,9 +63,7 @@ function PickCard({ cardList = [], onEvaluate, active }) {
 
     $card.style.transform = `translate(${dx}px, ${dy}px) rotate(${deg}deg)`;
 
-    if (isMediaPlaying()) {
-      // dispatch(setDragingContent());
-    }
+    dispatch(setDragingContent());
 
     const newProgress = clamp(dx / 100, -1, 1);
     setProgress(newProgress);
@@ -111,12 +110,13 @@ function PickCard({ cardList = [], onEvaluate, active }) {
       if (isSelect) {
         const selectedCard = cardList[cardList.length - 1];
         onEvaluate?.(selectedCard, isGood ? "good" : "bad");
-
-        dispatch(setPauseContent());
       }
 
       // activeScroll();
     }, 300);
+
+    if (isSelect || posts?.content?.status === "draging")
+      dispatch(setPauseContent());
   }, [onEvaluate, progress]);
 
   const isMediaPlaying = () => {
@@ -124,6 +124,7 @@ function PickCard({ cardList = [], onEvaluate, active }) {
   };
 
   const handleOnClick = () => {
+    console.log("isMediaPlaying()", isMediaPlaying());
     if (isMediaPlaying()) {
       dispatch(setPauseContent());
     } else {
@@ -156,9 +157,6 @@ function PickCard({ cardList = [], onEvaluate, active }) {
             playsInline
             playing
             src={cardList?.[0]}
-            light={`https://i.ytimg.com/vi/${getYouTubeIdFromEmbedUrl(
-              cardList?.[0]
-            )}/maxresdefault.jpg`}
             playIcon={<PlayCircle />}
             config={{
               youtube: {
@@ -185,7 +183,9 @@ function PickCard({ cardList = [], onEvaluate, active }) {
                 onTouchStart: handleStart,
                 onMouseDown: handleStart,
               }}
-              onClick={handleOnClick}
+              onClick={() => {
+                if (isLastCard) handleOnClick();
+              }}
             >
               <div className={styles.card_inner}>
                 <div className={styles.image_wrap}>
@@ -206,7 +206,7 @@ function PickCard({ cardList = [], onEvaluate, active }) {
                   {!active && <Loading_Card />}
                 </div>
 
-                {isLastCard && (
+                {posts?.content?.status === "draging" && (
                   <ProgressMask
                     progress={progress}
                     isInteracting={isInteracting}

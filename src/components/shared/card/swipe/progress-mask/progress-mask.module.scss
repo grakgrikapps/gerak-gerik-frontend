@@ -8,6 +8,11 @@
   left: 0;
   text-align: center;
 
+  /* Center semua konten */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   &.active {
     .icon_wrap {
       opacity: 1;
@@ -16,23 +21,15 @@
 }
 
 .good {
-  background-color: #2D67F6;
-
-  .circle_wrap {
-    left: 20px;
-  }
+  background-color: #2d67f6;
 
   .bar {
-    stroke: #2D67F6;
+    stroke: #2d67f6;
   }
 }
 
 .bad {
   background-color: #f44336;
-
-  .circle_wrap {
-    right: 20px;
-  }
 
   .bar {
     stroke: #f44336;
@@ -40,9 +37,12 @@
 }
 
 .circle_wrap {
-  position: absolute;
-  top: 20px;
+  position: relative;
   font-size: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   .circle_progress {
     transform: rotate(-90deg);
@@ -50,13 +50,10 @@
 
   .bar {
     fill: none;
-  }
-
-  .bar {
     stroke: #e6e6e6;
     opacity: 1;
     stroke-linecap: round;
-    stroke-width: 4px;
+    stroke-width: 6px;
     transition: opacity 0.4s ease-out;
   }
 }
@@ -75,16 +72,23 @@
   transform: translate(-50%, -50%);
   transition: opacity 0.4s ease-out;
 
-  img {
-    width: 30px;
-    height: 30px;
+  .icon_good {
+    width: 40px;
+    height: 40px;
+    margin-top: -5px;
+  }
+
+  .icon_bad {
+    width: 40px;
+    height: 40px;
+    margin-top: 0px;
   }
 }
 
 .label_left,
 .label_right {
-  font-size: 24px;       /* lebih besar */
-  font-weight: 700;      /* lebih tebal */
+  font-size: 24px; /* lebih besar */
+  font-weight: 700; /* lebih tebal */
   color: #fff;
   position: absolute;
   top: 50%;
@@ -115,4 +119,17 @@
 .active .label_left,
 .active .label_right {
   opacity: 1;
+}
+
+.center_content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.label {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 12px; /* jarak antara lingkaran dan teks */
 }
