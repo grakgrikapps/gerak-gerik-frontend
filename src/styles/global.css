@@ -143,3 +143,7 @@ section {
     bottom: 10px;
   }
 }
+
+.pickcard-swipe {
+  touch-action: pan-y; /* biar vertical scroll masih jalan */
+}

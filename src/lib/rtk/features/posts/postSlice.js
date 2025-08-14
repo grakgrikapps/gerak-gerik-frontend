@@ -10,7 +10,7 @@ const initialState = {
     type: null,
     value: null,
     thumbnail: null,
-    status: "empty", // 'empty', 'idle', 'loading', 'playing', 'loading', 'error
+    status: "empty", // 'empty', 'idle', 'loading', 'playing', 'loading', 'error', 'draging'
   },
   vote: null, // grak, grik
   status: "loading", // 'empty', 'idle', 'loading', 'playing', 'loading', 'error
@@ -37,6 +37,12 @@ export const postsSlice = createAppSlice({
       state.content = {
         ...state.content,
         status: "pause",
+      };
+    }),
+    setDragingContent: create.reducer((state, action) => {
+      state.content = {
+        ...state.content,
+        status: "draging",
       };
     }),
     setPlayContent: create.reducer((state, action) => {
@@ -112,6 +118,7 @@ export const {
   setPauseContent,
   setPlayContent,
   setIdleContent,
+  setDragingContent,
   // setComment,
   // setCommentReplies,
   // clearCommentReplies,

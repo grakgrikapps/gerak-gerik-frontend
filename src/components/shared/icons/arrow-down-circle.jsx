@@ -5,8 +5,8 @@ function Icon({ color = "#ffffffff" }) {
   return (
     <SvgIcon
       sx={{
-        width: "30px",
-        height: "30px",
+        width: "40px",
+        height: "40px",
         filter: "drop-shadow(0px 2px 4px rgba(0,0,0,0.5))",
       }}
     >
