@@ -34,6 +34,7 @@ function Home_v2_pages({ request, detail }) {
 
   const [isSliding, setIsSliding] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState(0);
+  const [alreadyVote, setAlreadyVote] = React.useState(false);
 
   const isMediaPause = () => {
     return ["empty", "error", "pause", "idle"].includes(posts?.content?.status);
@@ -43,6 +44,7 @@ function Home_v2_pages({ request, detail }) {
     setActiveIndex(props.activeIndex);
     dispatch(setIdleContent());
     dispatch(setCurrentPost(posts?.list?.[props.activeIndex]));
+    setAlreadyVote(posts?.list?.[props.activeIndex]?.has_voted);
   };
 
   React.useEffect(() => {
@@ -52,18 +54,13 @@ function Home_v2_pages({ request, detail }) {
     setActiveIndex(0);
   }, [request]);
 
+  console.log("posts?.status", posts?.status);
+
   return (
     <Container disableGutters maxWidth={false} sx={{ p: 0, m: 0 }}>
       <Box sx={{ position: "relative" }}>
         <Swiper
           direction={"vertical"}
-          // pagination={{
-          //   enabled: false
-          // }}
-          // navigation={{
-          //   nextEl: <ArrowUpCircle />,
-          //   prevEl: <ArrowDownCircle />,
-          // }}
           navigation={{
             prevEl: navigationPrevRef.current,
             nextEl: navigationNextRef.current,
@@ -82,7 +79,7 @@ function Home_v2_pages({ request, detail }) {
           simulateTouch={false}
           onSlideChangeTransitionStart={() => setIsSliding(true)}
           onSlideChangeTransitionEnd={() => setIsSliding(false)}
-          enabled={!posts?.list?.[activeIndex]?.has_voted}
+          allowTouchMove={false}
         >
           {posts?.status === "loading" && (
             <SwiperSlide>
@@ -119,6 +116,7 @@ function Home_v2_pages({ request, detail }) {
                           cardList={[item?.videos?.[0]?.url]}
                           active={activeIndex === index}
                           current={item}
+                          onEvaluate={() => setAlreadyVote(true)}
                         />
                       </Box>
 
@@ -174,16 +172,14 @@ function Home_v2_pages({ request, detail }) {
         <Box
           sx={{
             position: "absolute",
-            top: "calc(50% + 40px)", // 40px di bawah tombol pause
+            bottom: "calc(10% + 50px)", // 40px di bawah tombol pause
             left: "50%", // titik tengah horizontal
             transform: "translateX(-50%)", // geser ke kiri setengah lebar
             display:
-              !isSliding && isMediaPause() && posts?.status !== "loading"
-                ? "flex"
-                : "none",
+              !isSliding && posts?.status !== "loading" ? "flex" : "none",
             alignItems: "center",
             gap: "8px",
-            zIndex: 10,
+            zIndex: 1000,
           }}
         >
           {/* PREV BUTTON */}
@@ -321,7 +317,11 @@ export const Empty_Card = () => {
         </Typography>
 
         <Link href={`/post/create`}>
-          <Button variant="contained" size="small" sx={{ mt: 1, textTransform: 'capitalize'}}>
+          <Button
+            variant="contained"
+            size="small"
+            sx={{ mt: 1, textTransform: "capitalize" }}
+          >
             Buat Post
           </Button>
         </Link>
