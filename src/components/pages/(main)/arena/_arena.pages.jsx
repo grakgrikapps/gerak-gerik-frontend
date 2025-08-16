@@ -21,6 +21,8 @@ function Arena_pages() {
     handleRefresh();
   }, []);
 
+  console.log("arena", arena);
+
   return (
     <Container>
       {arena?.list?.map((item, index) => (

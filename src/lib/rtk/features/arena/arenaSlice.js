@@ -19,10 +19,10 @@ export const arenaSlice = createAppSlice({
     }),
     setSelectedArena: create.reducer((state, action) => {
       state.filter.id = action.payload;
-    })
-    // setArena: create.reducer((state, action) => {
-    //   state.list = action.payload;
-    // }),
+    }),
+    setArena: create.reducer((state, action) => {
+      state.list = action.payload;
+    }),
     // setCurrentArena: create.reducer((state, action) => {
     //   state.current = action.payload;
     // }),
@@ -30,4 +30,4 @@ export const arenaSlice = createAppSlice({
 });
 
 // Action creators
-export const { setFollowingArena, setSelectedArena } = arenaSlice.actions;
+export const { setFollowingArena, setSelectedArena, setArena } = arenaSlice.actions;
