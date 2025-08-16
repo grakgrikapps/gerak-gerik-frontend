@@ -77,7 +77,7 @@ function Top_bar() {
           justifyContent="space-between"
           alignItems="center"
         >
-          <Grid>
+          <Grid size={{ xs: 1 }}>
             <Link href="/profile">
               <IconButton size="small">
                 <Avatar
@@ -90,7 +90,7 @@ function Top_bar() {
             </Link>
           </Grid>
 
-          <Grid size={{ xs: 10.5 }}>
+          <Grid size={{ xs: 10.4, md: 10.5 }}>
             <Box
               mt={0.5}
               gap={2}
