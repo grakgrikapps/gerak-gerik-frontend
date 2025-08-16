@@ -7,11 +7,7 @@ async function Layout(props) {
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
 
-  if (!token) {
-    return <Logout />;
-  } else {
-    return <>{children}</>;
-  }
+  return <>{children}</>;
 }
 
 export default Layout;

@@ -4,9 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import Bottom_bar from "../shared/bar/bottom.bar";
 import ArrowLeftIcon from "@/components/shared/icons/arrow-left";
-import SearchIcon from "@/components/shared/icons/search";
 import { Container, IconButton, Typography } from "@mui/material";
 
 function Arena_layout({ children }) {
@@ -54,7 +52,7 @@ function Arena_layout({ children }) {
               <Typography variant="h4">Arena</Typography>
 
               <IconButton size="small">
-                <SearchIcon color="#999DA3" />
+                {/* <SearchIcon color="#999DA3" /> */}
               </IconButton>
             </Container>
           </Box>

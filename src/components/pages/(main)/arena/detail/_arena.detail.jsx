@@ -124,14 +124,16 @@ function Arena_Detail_Page() {
                 src={arena?.photo}
               />
 
-              <Chip
-                label={hasFollow ? "Leave" : "Join"}
-                variant={hasFollow ? "contained" : "outlined"}
-                size="small"
-                color="primary"
-                sx={{ borderRadius: "4px" }}
-                onClick={() => handleJoin()}
-              />
+              {auth?.profile && (
+                <Chip
+                  label={hasFollow ? "Leave" : "Join"}
+                  variant={hasFollow ? "contained" : "outlined"}
+                  size="small"
+                  color="primary"
+                  sx={{ borderRadius: "4px" }}
+                  onClick={() => handleJoin()}
+                />
+              )}
             </Box>
 
             {/* Content */}

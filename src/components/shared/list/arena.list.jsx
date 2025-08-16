@@ -2,8 +2,10 @@ import http from "@/lib/axios/http";
 import { Avatar, Box, Chip, Grid, Typography } from "@mui/material";
 import Link from "next/link";
 import React from "react";
+import { useSelector } from "react-redux";
 
 function Arena_list({ photo, name, slug, user_arenas, id, handleRefresh }) {
+  const auth = useSelector((state) => state.auth);
   const [hasFollow, setHasFollow] = React.useState(
     Boolean(user_arenas?.length)
   );
@@ -44,15 +46,17 @@ function Arena_list({ photo, name, slug, user_arenas, id, handleRefresh }) {
           </Box>
         </Link>
       </Grid>
-      <Grid size={{sm: 2, xs: 2.5}}>
-        <Chip
-          variant={hasFollow ? "contained" : "outlined"}
-          label={hasFollow ? "Unfollow" : "Follow"}
-          color={"primary"}
-          size="small"
-          onClick={() => handleFollow()}
-          sx={{ width: "100%" }}
-        />
+      <Grid size={{ sm: 2, xs: 2.5 }}>
+        {auth?.profile && (
+          <Chip
+            variant={hasFollow ? "contained" : "outlined"}
+            label={hasFollow ? "Unfollow" : "Follow"}
+            color={"primary"}
+            size="small"
+            onClick={() => handleFollow()}
+            sx={{ width: "100%" }}
+          />
+        )}
       </Grid>
     </Grid>
   );

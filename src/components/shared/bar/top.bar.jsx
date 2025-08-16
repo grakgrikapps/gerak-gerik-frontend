@@ -33,9 +33,11 @@ function Top_bar() {
   const arena = useSelector((state) => state.arena);
 
   React.useEffect(() => {
-    http.get("/auth/profile/arena").then((res) => {
-      dispatch(setFollowingArena(res?.data));
-    });
+    if (profile?.id) {
+      http.get("/auth/profile/arena").then((res) => {
+        dispatch(setFollowingArena(res?.data));
+      });
+    }
   }, []);
 
   React.useEffect(() => {

@@ -20,9 +20,7 @@ function Arena_pages() {
   React.useEffect(() => {
     handleRefresh();
   }, []);
-
-  console.log("arena", arena);
-
+  
   return (
     <Container>
       {arena?.list?.map((item, index) => (
