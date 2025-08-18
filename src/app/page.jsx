@@ -3,19 +3,13 @@ import React from "react";
 import Empty_layout from "@/components/layout/_empty.layout";
 import { Box, Typography } from "@mui/material";
 import { motion } from "framer-motion";
-import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 
 function Page() {
   const router = useRouter();
-  const state = useSelector((state) => state.auth);
 
   React.useEffect(() => {
-    if (state.token) {
-      router.replace("/home");
-    } else {
-      router.replace("/login");
-    }
+    router.replace("/home");
   }, []);
 
   return (

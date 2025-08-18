@@ -13,6 +13,7 @@ import ReactPlayer from "react-player";
 import PlayCircle from "@/components/shared/icons/play-circle";
 import { Loading_Card } from "@/components/pages/(main)/home/home.v2.pages";
 import http from "@/lib/axios/http";
+import { setModal } from "@/lib/rtk/features/global/globalSlice";
 
 // Fungsi untuk mendapatkan posisi dari mouse/touch
 const getPosition = (event) => {
@@ -141,7 +142,19 @@ function PickCard({ cardList = [], onEvaluate, active, current, index }) {
             await http.get(`/posts/downvote/${currentCard?.id}`);
           }
         } catch (err) {
-          console.error("Vote gagal, rollback...", err);
+          if(err.status === 401) {
+            dispatch(
+              setModal({
+                enabled: true,
+                title: "Vote Not Counted",
+                body: `Your vote can't be counted because you're not logged in. Please login first.`,
+                type: "logout",
+                buttonAccept: "Login",
+                buttonCancel: "Cancel",
+              })
+            );
+          }
+
           dispatch(setHasVotePost({ index, hasVote: false }));
 
           // Rollback ke nilai lama

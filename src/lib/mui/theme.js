@@ -102,6 +102,13 @@ const theme = createTheme({
           textTransform: "capitalize",
           minHeight: "48px",
         },
+        outlinedSizeLarge: {
+          borderRadius: "10px",
+          minHeight: "48px",
+          fontSize: "16px",
+          fontWeight: 500,
+          textTransform: "capitalize",
+        },
       },
       defaultProps: {
         disableElevation: true,

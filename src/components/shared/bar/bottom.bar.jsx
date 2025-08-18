@@ -20,6 +20,7 @@ import { setStatusComment } from "@/lib/rtk/features/comments/commentSlice";
 function Bottom_bar() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth)
   const posts = useSelector((state) => state.posts);
 
   const [selected, setSelected] = React.useState("Home");

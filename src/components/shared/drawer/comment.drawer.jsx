@@ -155,6 +155,7 @@ function Comment_drawer(props) {
             "&::-webkit-scrollbar": { display: "none" },
           },
         }}
+        disableSwipeToOpen
       >
         <Box p="10px">
           <Box display="flex" justifyContent="center" mb="5px">

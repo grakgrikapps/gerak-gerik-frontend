@@ -26,10 +26,10 @@ http.interceptors.response.use(
     return response?.data;
   },
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // Tangani error 401 di sini, misalnya, redirect atau tampilkan pesan
-      if (window) window.location.replace("/logout");
-    }
+    // if (error.response && error.response.status === 401) {
+    //   // Tangani error 401 di sini, misalnya, redirect atau tampilkan pesan
+    //   if (window) window.location.replace("/logout");
+    // }
     return Promise.reject(error);
   }
 );

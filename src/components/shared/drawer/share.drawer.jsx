@@ -15,7 +15,7 @@ function Share_drawer(props) {
   const post = useSelector((state) => state.posts);
   const currentUrl =
     typeof window !== "undefined"
-      ? `${window.location.origin}/home?slug=${post?.current?.slug}`
+      ? `${window.location.origin}/posts/${post?.current?.slug}`
       : "";
 
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
@@ -61,6 +61,7 @@ function Share_drawer(props) {
         onClose={() => {
           props.handleClose();
         }}
+        disableSwipeToOpen
         onOpen={() => props.handleOpen()}
         sx={{
           "& .MuiPaper-root": {

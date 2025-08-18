@@ -3,6 +3,7 @@ import { postsSlice } from "./features/posts/postSlice";
 import { authSlice } from "./features/auth/authSlice";
 import { arenaSlice } from "./features/arena/arenaSlice";
 import { commentsSlice } from "./features/comments/commentSlice";
+import { globalSlice } from "./features/global/globalSlice";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
 
@@ -11,7 +12,8 @@ const rootReducer = combineSlices(
   postsSlice,
   authSlice,
   arenaSlice,
-  commentsSlice
+  commentsSlice,
+  globalSlice
 );
 
 // Konfigurasi persist

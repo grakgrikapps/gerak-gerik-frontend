@@ -14,6 +14,7 @@ function Bookmark_drawer(props) {
           props.handleClose();
         }}
         onOpen={() => props.handleOpen()}
+        disableSwipeToOpen
         sx={{
           "& .MuiPaper-root": {
             margin: "auto",

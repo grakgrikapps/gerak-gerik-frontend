@@ -53,6 +53,9 @@ function Home_v2_pages({ request, detail }) {
     );
     setActiveIndex(0);
   }, [request]);
+
+  console.log(posts)
+  
   return (
     <Container disableGutters maxWidth={false} sx={{ p: 0, m: 0 }}>
       <Box sx={{ position: "relative" }}>
