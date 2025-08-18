@@ -2,8 +2,10 @@ import React from "react";
 import { Box, Button, Dialog, DialogContent, Typography } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { setModal } from "@/lib/rtk/features/global/globalSlice";
+import { useRouter } from "next/navigation";
 
 function SimpleModal() {
+  const router = useRouter();
   const global = useSelector((state) => state.globals);
   const dispatch = useDispatch();
 
@@ -14,6 +16,7 @@ function SimpleModal() {
   const handleSubmit = () => {
     switch (global?.modal?.type) {
       case "logout":
+        router.push("/logout");
         break;
 
       default:
@@ -50,7 +53,7 @@ function SimpleModal() {
             variant="contained"
             size="large"
             color="inherit"
-            onClick={global?.modal?.handleSubmit}
+            onClick={handleSubmit}
             fullWidth
           >
             {global?.modal?.buttonAccept}

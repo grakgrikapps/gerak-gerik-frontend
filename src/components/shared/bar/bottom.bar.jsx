@@ -14,14 +14,18 @@ import Bookmark_drawer from "../drawer/bookmark.drawer";
 import Share_drawer from "../drawer/share.drawer";
 import http from "@/lib/axios/http";
 import { useDispatch, useSelector } from "react-redux";
-import { setPauseContent, setHasBookmark } from "@/lib/rtk/features/posts/postSlice";
+import {
+  setPauseContent,
+  setHasBookmark,
+} from "@/lib/rtk/features/posts/postSlice";
 import { setStatusComment } from "@/lib/rtk/features/comments/commentSlice";
+import { setModal } from "@/lib/rtk/features/global/globalSlice";
 
 function Bottom_bar() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const auth = useSelector((state) => state.auth)
   const posts = useSelector((state) => state.posts);
+  const auth = useSelector((state) => state.auth);
 
   const [selected, setSelected] = React.useState("Home");
   const [showBookmarkDrawer, setShowBookmarkDrawer] = React.useState(false);
@@ -31,15 +35,26 @@ function Bottom_bar() {
   const handleSave = async () => {
     try {
       if (hasBookmark) {
-        dispatch(setHasBookmark(false));
         await http.delete(`/bookmarks/${posts?.current?.id}`);
+        dispatch(setHasBookmark(false));
       } else {
-        setShowBookmarkDrawer(true);
-        dispatch(setHasBookmark(true));
         await http.get(`/bookmarks/${posts?.current?.id}`);
+        dispatch(setHasBookmark(true));
+        setShowBookmarkDrawer(true);
       }
     } catch (error) {
-      console.error(error);
+      if (error.status === 401) {
+        dispatch(
+          setModal({
+            enabled: true,
+            title: "Save Not Counted",
+            body: `Your save can't be counted because you're not logged in. Please login first.`,
+            type: "logout",
+            buttonAccept: "Login",
+            buttonCancel: "Cancel",
+          })
+        );
+      }
     }
   };
 
@@ -85,7 +100,20 @@ function Bottom_bar() {
             setSelected(item.label);
 
             if (item.label === "Arena") {
-              router.push(`/arena`);
+              if (auth?.profile) {
+                router.push(`/arena`);
+              } else {
+                dispatch(
+                  setModal({
+                    enabled: true,
+                    title: "Login first",
+                    body: `Your save can't access arena because you're not logged in. Please login first.`,
+                    type: "logout",
+                    buttonAccept: "Login",
+                    buttonCancel: "Cancel",
+                  })
+                );
+              }
             }
 
             if (item.label === "Home") {

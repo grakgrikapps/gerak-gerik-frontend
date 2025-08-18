@@ -21,6 +21,7 @@ import SendIcon from "@/components/shared/icons/send";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import Comment_list from "../list/comment/comment.list";
 import * as yup from "yup";
+import { setModal } from "@/lib/rtk/features/global/globalSlice";
 
 const validationSchema = yup.object({
   comment: yup
@@ -98,10 +99,10 @@ function Comment_drawer(props) {
           dispatch(
             setListComment(
               comment?.list?.map((item) => {
-                if (item.id === selectedReplies?.id) {
+                if (item?.id === selectedReplies?.id) {
                   return {
                     ...item,
-                    replies: [...item.replies, { id: request?.data?.id }],
+                    replies: [...item?.replies, { id: request?.data?.id }],
                   };
                 } else {
                   return item;
@@ -115,8 +116,24 @@ function Comment_drawer(props) {
 
         // Optional: replace temp comment with actual from server if ID is important
       } catch (err) {
+        console.log(err);
+        if (err.status === 401) {
+          dispatch(
+            setModal({
+              enabled: true,
+              title: "Comment Not Counted",
+              body: `Your comment can't be counted because you're not logged in. Please login first.`,
+              type: "logout",
+              buttonAccept: "Login",
+              buttonCancel: "Cancel",
+            })
+          );
+        }
+
         dispatch(
-          setListComment(comment?.list?.filter((c) => c.id !== tempComment.id))
+          setListComment(
+            comment?.list?.filter((c) => c?.id !== tempComment?.id)
+          )
         );
       } finally {
         setIsSending(false);
@@ -249,7 +266,6 @@ function Comment_drawer(props) {
                   />
                 </motion.div>
               ))}
-
           </AnimatePresence>
         </Box>
 
