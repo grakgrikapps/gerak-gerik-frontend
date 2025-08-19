@@ -49,7 +49,7 @@ function Top_bar() {
   }, [search.get("arena_id")]);
 
   const handleChangeArena = async (selected) => {
-    dispatch(setSelectedArena(selected));
+    dispatch(setSelectedArena(selected ?? 0));
     dispatch(setStatusPost("loading"));
 
     const request = await http.get(`/posts`, {
