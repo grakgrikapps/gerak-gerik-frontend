@@ -117,7 +117,7 @@ function Profile_Page() {
                 variant="outlined"
                 size="small"
                 sx={{ borderRadius: "4px", border: "1px solid #000000" }}
-                onClick={() => router.push("/post/create")}
+                onClick={() => router.push("/profile/post/create")}
               />
             </Box>
 
