@@ -14,14 +14,14 @@ export const arenaSlice = createAppSlice({
   initialState,
   reducers: (create) => ({
     setFollowingArena: create.reducer((state, action) => {
-      state.following = action.payload;
+      state.following = action?.payload;
       state.status = "idle";
     }),
     setSelectedArena: create.reducer((state, action) => {
       state.filter.id = action?.payload;
     }),
     setArena: create.reducer((state, action) => {
-      state.list = action.payload;
+      state.list = action?.payload;
     }),
     // setCurrentArena: create.reducer((state, action) => {
     //   state.current = action.payload;
