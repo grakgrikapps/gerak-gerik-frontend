@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Logout_Page from "@/components/pages/(auth)/logout";
 

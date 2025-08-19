@@ -41,10 +41,10 @@ function Home_v2_pages({ request, detail }) {
   };
 
   const handleChange = (props) => {
-    setActiveIndex(props.activeIndex);
+    setActiveIndex(props?.activeIndex);
     dispatch(setIdleContent());
-    dispatch(setCurrentPost(posts?.list?.[props.activeIndex]));
-    setAlreadyVote(posts?.list?.[props.activeIndex]?.has_voted);
+    dispatch(setCurrentPost(posts?.list?.[props?.activeIndex]));
+    setAlreadyVote(posts?.list?.[props?.activeIndex]?.has_voted);
   };
 
   React.useEffect(() => {
@@ -54,7 +54,6 @@ function Home_v2_pages({ request, detail }) {
     setActiveIndex(0);
   }, [request]);
 
-  console.log(posts)
   
   return (
     <Container disableGutters maxWidth={false} sx={{ p: 0, m: 0 }}>
@@ -62,12 +61,12 @@ function Home_v2_pages({ request, detail }) {
         <Swiper
           direction={"vertical"}
           navigation={{
-            prevEl: navigationPrevRef.current,
-            nextEl: navigationNextRef.current,
+            prevEl: navigationPrevRef?.current,
+            nextEl: navigationNextRef?.current,
           }}
           onBeforeInit={(swiper) => {
-            swiper.params.navigation.prevEl = navigationPrevRef.current;
-            swiper.params.navigation.nextEl = navigationNextRef.current;
+            swiper.params.navigation.prevEl = navigationPrevRef?.current;
+            swiper.params.navigation.nextEl = navigationNextRef?.current;
           }}
           modules={[Navigation]}
           className="swiper-container-vertical"

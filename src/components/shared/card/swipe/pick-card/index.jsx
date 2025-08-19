@@ -265,9 +265,9 @@ function PickCard({ cardList = [], onEvaluate, active, current, index }) {
         )}
 
         {!posts?.current?.has_voted &&
-          cardList.map((card, key) => {
+          cardList?.map((card, key) => {
             const isActiveCard = key >= activeIndex;
-            const isLastCard = key === cardList.length - 1;
+            const isLastCard = key === cardList?.length - 1;
 
             return (
               <div
