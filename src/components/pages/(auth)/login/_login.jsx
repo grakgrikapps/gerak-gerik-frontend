@@ -48,7 +48,8 @@ function Login_page() {
         const profile = await http.get("auth/profile");
         dispatch(setProfile(profile.data?.profile));
 
-        router.replace("/home");
+
+        window.location.replace('/home');
       } catch (error) {
         if (error?.response?.data?.messages === "User not exist") {
           formik.setFieldError(
