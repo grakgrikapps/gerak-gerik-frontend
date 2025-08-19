@@ -18,7 +18,7 @@ export const arenaSlice = createAppSlice({
       state.status = "idle";
     }),
     setSelectedArena: create.reducer((state, action) => {
-      state.filter.id = action.payload;
+      state.filter.id = action?.payload;
     }),
     setArena: create.reducer((state, action) => {
       state.list = action.payload;
