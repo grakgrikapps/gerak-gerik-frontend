@@ -32,8 +32,6 @@ function Top_bar() {
   const profile = useSelector((state) => state.auth.profile);
   const arena = useSelector((state) => state.arena);
 
-  console.log(profile)
-
   React.useEffect(() => {
     if (profile?.id) {
       http.get("/auth/profile/arena").then((res) => {
@@ -110,7 +108,7 @@ function Top_bar() {
                     name: item?.arena?.name,
                     arena_id: item?.arena_id,
                   })),
-                ].map((item) => (
+                ]?.map((item) => (
                   <Button
                     key={item.arena_id}
                     size="small"

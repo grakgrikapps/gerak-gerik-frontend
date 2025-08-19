@@ -244,7 +244,7 @@ function Profile_Detail_Page() {
             </motion.div>
           )}
 
-          {postLists.map((item, key) => (
+          {postLists?.map((item, key) => (
             <motion.div
               key={key}
               initial={{ opacity: 0, y: 20 }}

@@ -198,7 +198,7 @@ function Arena_Detail_Page() {
       {/* Content */}
       <Container>
         <Box mb="20px" display="flex" flexDirection="column" gap="30px">
-          {postLists.length === 0 && (
+          {postLists?.length === 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -222,7 +222,7 @@ function Arena_Detail_Page() {
             </motion.div>
           )}
 
-          {postLists.map((item, key) => (
+          {postLists?.map((item, key) => (
             <motion.div
               key={key}
               initial={{ opacity: 0, y: 20 }}
