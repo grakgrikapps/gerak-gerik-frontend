@@ -18,18 +18,6 @@ import Link from "next/link";
 import http from "@/lib/axios/http";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import Uppy from "@uppy/core";
-// For now, if you do not want to install UI components you
-// are not using import from lib directly.
-import Dashboard from "@uppy/react/lib/Dashboard";
-// import DashboardStore from "@uppy/dashboard";
-import Tus from "@uppy/tus";
-import XHR from "@uppy/xhr-upload";
-import MuxUploader from "@mux/mux-uploader-react";
-// import axios from "axios";
-
-import "@uppy/core/dist/style.min.css";
-import "@uppy/dashboard/dist/style.min.css";
 
 const validationSchema = yup.object({
   url: yup
@@ -62,47 +50,6 @@ function Post_create_pages() {
   const [snackbarMessage, setSnackbarMessage] = React.useState("");
   const [normalizedUrl, setNormalizedUrl] = React.useState("");
   const [videoId, setVideoId] = React.useState(null);
-
-  const [uppy, setUppy] = React.useState(null);
-
-  React.useEffect(() => {
-    const instance = new Uppy({
-      autoProceed: false,
-      restrictions: {
-        maxNumberOfFiles: 1,
-        allowedFileTypes: ["video/*"],
-      },
-    }).use(XHR, {
-      endpoint:
-        "https://direct-uploads.oci-us-ashburn-1-vop1.production.mux.com/upload/Ei02wgorWJwmsVQF7tk2hv01gERczUhe2fKekEBAfYOaM?token=eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg5MTg4MjMwOTIyNzA1NjMwMTMiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJkdSIsImV4cCI6MTc1NjMyMTY1Mywic3ViIjoiRWkwMndnb3JXSndtc1ZRRjd0azJodjAxZ0VSY3pVaGUyZktla0VCQWZZT2FNIn0.NfS888-7wrXl-hI0bbn8XaYV7Jom_RmAXVPFdzlzBVS4B5kJFkiuvsUe5bACDVLrkbiv2JoBtnn5sYlho_-LZW3r_qKPF1Wu8ruAO8ZMrtZQJr8wr7hMihrJME0PeChLSZl5DQqHGk7JeHu8hL85fYeNwkJydaUELOj2OL93gbBqKTSlMy65w-iCMlBQ2xYFpc4IyUM4uuUB-F5IHhXfq4Cex4cq3GaqJSKg35S2Gq3RGlyzWsgHImbYWlmcLay_6-pgvYiaR-bEiKmbpUd77MsmtE4h6kAAHi3hX2P-7UMbtkILKBzhVUQWnxYIesmOh1KNojIqCty5bVZEUSt4eg",
-      method: "PUT",
-      getResponseData: (xhr) => {
-        // Karena Mux direct upload gak return body, kita bikin dummy
-        return { status: xhr.status, uploadURL: xhr.responseURL };
-      },
-      getResponseError: (xhr) => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          return null; // artinya sukses
-        }
-        return new Error("Upload failed");
-      },
-    });;
-
-    instance.on("upload-success", (file, response) => {
-      console.log("✅ Upload success:", file);
-      console.log("📌 Mux Upload URL:", response?.uploadURL);
-    });
-
-    instance.on("error", (err) => {
-      console.error("❌ Upload error:", err);
-    });
-
-    setUppy(instance);
-
-    return () => {
-      instance.close();
-    };
-  }, []);
 
   const formik = useFormik({
     initialValues: {
@@ -186,30 +133,6 @@ function Post_create_pages() {
           below, we’ll embed it beautifully for you. No need to download or
           reupload.
         </Typography>
-
-        {uppy && (
-          <Dashboard
-            theme="light"
-            uppy={uppy}
-            proudlyDisplayPoweredByUppy={false}
-            // note="Pilih file video kamu untuk upload"
-            height={200}
-            showProgressDetails
-          />
-        )}
-
-        <MuxUploader
-          endpoint={
-            "https://direct-uploads.oci-us-ashburn-1-vop1.production.mux.com/upload/fhVG01JPUEaQSYkoD97jb8YDEEHb01NhlmwL00J01ela2n8?token=eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg5MTg4MjMwOTIyNzA1NjMwMTMiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJkdSIsImV4cCI6MTc1NjMyMTE2OCwic3ViIjoiZmhWRzAxSlBVRWFRU1lrb0Q5N2piOFlERUVIYjAxTmhsbXdMMDBKMDFlbGEybjgifQ.TSmwn5HobaYfJkso2HVjXf1-1lrUDUY2eapCOvSv3lKGQ8xgq3_sUcxWBQ0vfrNYK9tuMRy9uBitgPqGFaQ-zz06n0-hPOjSQ_C0gOCpPP-V9XbbFSSf-d3UA3TG8GyM9v70fv2yfDL5N3T5Ed7Xbv4wPEQCaLYfOVASwD3ejc6OJN90EOSK73YvqMtEAzlh3ftGFIQ5pcRz4F4deEWltqx0LAxzsPG1we3dHw-7t31mo2dT1xVErov827tE7LOOUWAbhsgDEDZ1qYcfpeIb5a4SrQ4eCu6S7MBgLXeFWinJ2zV39bHJidfSb6ApJ2sUExxEF0--N-zYasn2-_2Tpw"
-          }
-        />
-
-        {/* <MuxUploader
-          endpoint={
-            "https://direct-uploads.oci-us-ashburn-1-vop1.production.mux.com/upload/oiqfvJyJIeEUUu1T01do19C6MBydojPRZ1iOlDw01jocE?token=eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg5MTg4MjMwOTIyNzA1NjMwMTMiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJkdSIsImV4cCI6MTc1NjMxNDQ2MCwic3ViIjoib2lxZnZKeUpJZUVVVXUxVDAxZG8xOUM2TUJ5ZG9qUFJaMWlPbER3MDFqb2NFIn0.RWtPS_WGFCWinGTjrsHu8xdiWxrhxjU0Apb-usD8p48Gz7KPU8fHCKpk7EHg9X6nJ0vV3WZG4Jb_OM8D4WVoLpWerMg5lroYoIpH5TzeNIithGcS7aajQJGF2NXwgw4Fq_czgCuC96pJRIWb3-QOXvYjdMRt0g_2W6uMhzlI2_upeTX31N6aejvuSkFKCdAFI9bsEKkAkpAPjzqGDkQF7BO5Z0cJtGIxntloUtITIHXeZQdxwKQIkkkusv-IxaDJ5Zfz3RQtgXw2vQYLmELbvVt29bfR7HsK5WifVzHZHmpB4SMkr0vX51KqPLW9NCC3xs_tar9PGqZZmFsImNgJow"
-          }
-        /> */}
-
         <Box mt="30px" mb="20px">
           <Typography fontSize="12px" fontWeight={500} mb="10px">
             Youtube Link
