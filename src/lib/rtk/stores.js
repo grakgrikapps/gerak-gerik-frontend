@@ -20,7 +20,7 @@ const rootReducer = combineSlices(
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: [postsSlice.name, authSlice.name, arenaSlice.name], // hanya persist state `counter`, jangan quotesApi
+  whitelist: [postsSlice.name, authSlice.name], // hanya persist state `counter`, jangan quotesApi
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
