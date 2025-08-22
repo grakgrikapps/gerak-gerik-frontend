@@ -138,8 +138,6 @@ function Post_create_pages({ uploadUrl, id }) {
     http.get("/arena").then((response) => setArenaList(response.data));
   }, []);
 
-  console.log(formik);
-
   return (
     <Container sx={{ mb: "50px" }}>
       <Snackbar

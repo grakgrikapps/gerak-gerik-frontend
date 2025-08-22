@@ -2,13 +2,8 @@
 import React, { use } from "react";
 import styles from "@/styles/App.module.scss";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setCurrentPost,
-  initiationPost,
-} from "@/lib/rtk/features/posts/postSlice";
 import Layout from "@/components/shared/card/swipe/layout";
 import PickCard from "@/components/shared/card/swipe/pick-card";
-import http from "@/lib/axios/http";
 import { Box } from "@mui/system";
 import { CircularProgress, Typography } from "@mui/material";
 import { useSearchParams } from "next/navigation";
