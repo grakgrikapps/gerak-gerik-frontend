@@ -5,7 +5,7 @@ const initialState = {
   list: [],
   following: [],
   filter: { id: 0, keyword: "" },
-  status: "empty", // 'empty', 'loading', 'playing', 'loading', 'error', 'idle'
+  status: "loading", // 'empty', 'loading', 'playing', 'loading', 'error', 'idle'
 };
 
 // Slice definition
@@ -18,7 +18,7 @@ export const arenaSlice = createAppSlice({
       state.status = "idle";
     }),
     setSelectedArena: create.reducer((state, action) => {
-      if (state.filter.id) state.filter.id = action?.payload;
+      state.filter.id = action?.payload ?? 0;
     }),
     setArena: create.reducer((state, action) => {
       state.list = action?.payload;

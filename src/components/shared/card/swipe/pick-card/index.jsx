@@ -14,6 +14,7 @@ import PlayCircle from "@/components/shared/icons/play-circle";
 import { Loading_Card } from "@/components/pages/(main)/home/home.v2.pages";
 import http from "@/lib/axios/http";
 import { setModal } from "@/lib/rtk/features/global/globalSlice";
+import MuxPlayer from "@mux/mux-player-react/lazy";
 
 // Fungsi untuk mendapatkan posisi dari mouse/touch
 const getPosition = (event) => {
@@ -142,7 +143,7 @@ function PickCard({ cardList = [], onEvaluate, active, current, index }) {
             await http.get(`/posts/downvote/${currentCard?.id}`);
           }
         } catch (err) {
-          if(err.status === 401) {
+          if (err.status === 401) {
             dispatch(
               setModal({
                 enabled: true,
@@ -212,24 +213,49 @@ function PickCard({ cardList = [], onEvaluate, active, current, index }) {
     <>
       <div className={styles.container}>
         {(activeIndex < 0 || posts?.current?.has_voted) && (
-          <ReactPlayer
-            height="100%"
-            width="100%"
-            loop
-            src={cardList?.[0]}
-            playIcon={<PlayCircle />}
-            config={{
-              youtube: {
-                start: playedSeconds,
-              },
-            }}
-            onPlay={({ type }) => {
-              if (type === "play") dispatch(setPlayContent());
-            }}
-            onPause={({ type }) => {
-              if (type === "pause") dispatch(setPauseContent());
-            }}
-          />
+          <>
+            {getYouTubeIdFromEmbedUrl(cardList?.[0]) ? (
+              <ReactPlayer
+                height="100%"
+                width="100%"
+                loop
+                src={cardList?.[0]}
+                playIcon={<PlayCircle />}
+                config={{
+                  youtube: {
+                    start: playedSeconds,
+                  },
+                }}
+                onPlay={({ type }) => {
+                  if (type === "play") dispatch(setPlayContent());
+                }}
+                onPause={({ type }) => {
+                  if (type === "pause") dispatch(setPauseContent());
+                }}
+              />
+            ) : (
+              <MuxPlayer
+                loading="viewport"
+                playbackId={cardList?.[0]}
+                autoPlay
+                muted
+                loop
+                playsInline
+                nohotkeys
+                defaultShowRemainingTime={true}
+                maxResolution="720p"
+                className="custom-mux"
+                // controls={false}
+                style={{
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover", // biar tetap ter-crop rapi
+                }}
+              />
+            )}
+          </>
         )}
 
         {(activeIndex < 0 || posts?.current?.has_voted) && (
@@ -268,6 +294,7 @@ function PickCard({ cardList = [], onEvaluate, active, current, index }) {
           cardList?.map((card, key) => {
             const isActiveCard = key >= activeIndex;
             const isLastCard = key === cardList?.length - 1;
+            const youtubeId = getYouTubeIdFromEmbedUrl(card);
 
             return (
               <div
@@ -286,20 +313,67 @@ function PickCard({ cardList = [], onEvaluate, active, current, index }) {
                 <div className={styles.card_inner}>
                   <div className={styles.image_wrap}>
                     {activeIndex >= 0 && (
-                      <ReactPlayer
-                        height="100%"
-                        width="100%"
-                        loop
-                        playsInline
-                        ref={playerRef}
-                        playing={isMediaPlaying() && active}
-                        src={card}
-                        playIcon={<PlayCircle />}
-                        onProgress={handleProgress}
-                      />
+                      <>
+                        {youtubeId ? (
+                          <ReactPlayer
+                            height="100%"
+                            width="100%"
+                            loop
+                            playsInline
+                            ref={playerRef}
+                            playing={isMediaPlaying() && active}
+                            src={card}
+                            playIcon={<PlayCircle />}
+                            onProgress={handleProgress}
+                          />
+                        ) : (
+                          <MuxPlayer
+                            loading="viewport"
+                            playbackId={card}
+                            autoPlay
+                            muted
+                            nohotkeys
+                            loop
+                            playsInline
+                            controls={false}
+                            defaultShowRemainingTime={true}
+                            style={{
+                              top: 0,
+                              left: 0,
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover", // biar tetap ter-crop rapi
+                            }}
+                          />
+                          // <div
+                          //   style={{
+                          //     position: "relative",
+                          //     width: "100%",
+                          //     height: '100%',
+                          //     // paddingTop: "100%", // 16:9 ratio (9/16 = 0.5625)
+                          //     borderRadius: "12px",
+                          //     overflow: "hidden",
+                          //   }}
+                          // >
+                          //   <MuxPlayer
+                          //     playbackId={card}
+                          //     style={{
+                          //       position: "absolute",
+                          //       top: 0,
+                          //       left: 0,
+                          //       width: "100%",
+                          //       height: "100%",
+                          //       objectFit: "cover", // biar tetap ter-crop rapi
+                          //     }}
+                          //   />
+                          // </div>
+                        )}
+                      </>
                     )}
 
                     {!active && <Loading_Card />}
+
+                    {card}
                   </div>
 
                   {posts?.content?.status === "draging" && (

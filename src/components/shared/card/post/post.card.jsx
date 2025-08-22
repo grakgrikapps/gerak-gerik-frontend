@@ -24,6 +24,7 @@ import BookmarkIcon from "@/components/shared/icons/bookmark";
 import moment from "moment";
 import { getYouTubeIdFromEmbedUrl } from "@/utils/helper";
 import http from "@/lib/axios/http";
+import MuxPlayer from "@mux/mux-player-react";
 
 function Post_Card(props) {
   const [isVoting, setIsVoting] = React.useState(false);
@@ -89,20 +90,44 @@ function Post_Card(props) {
           borderRadius="15px"
           className="player-wrapper"
         >
-          <ReactPlayer
-            src={props?.videos?.[0]?.url}
-            light={`https://img.youtube.com/vi/${videoId}/0.jpg`}
-            width="100%"
-            height="100%"
-            playsInline
-            playing
-            // onPlay={() => props.setPlayingVideoId(videoId)}
-            // onPause={() => props.setPlayingVideoId(null)}
-            // controls
-            // controls={true}
-            style={{ borderRadius: "12px", overflow: "hidden" }}
-            className="iframe-player"
-          />
+          {videoId ? (
+            <ReactPlayer
+              src={props?.videos?.[0]?.url}
+              light={`https://img.youtube.com/vi/${videoId}/0.jpg`}
+              width="100%"
+              height="100%"
+              // playsInline
+              // playing
+              // onPlay={() => props.setPlayingVideoId(videoId)}
+              // onPause={() => props.setPlayingVideoId(null)}
+              // controls
+              // controls={true}
+              style={{ borderRadius: "12px", overflow: "hidden" }}
+              className="iframe-player"
+            />
+          ) : (
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                paddingTop: "78%", // 16:9 ratio (9/16 = 0.5625)
+                borderRadius: "12px",
+                overflow: "hidden",
+              }}
+            >
+              <MuxPlayer
+                playbackId={props?.videos?.[0]?.url}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover", // biar tetap ter-crop rapi
+                }}
+              />
+            </div>
+          )}
         </Box>
 
         {/* Comment Footer */}

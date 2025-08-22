@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import SearchIcon from "../icons/search";
 import {
   Avatar,
   Box,
@@ -9,6 +8,7 @@ import {
   Button,
   IconButton,
   Grid,
+  Skeleton,
 } from "@mui/material";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
@@ -82,12 +82,16 @@ function Top_bar() {
           <Grid size={{ xs: 1 }}>
             <Link href="/profile">
               <IconButton size="small">
-                <Avatar
-                  sizes="small"
-                  src={
-                    profile?.photo ?? "https://api.dicebear.com/9.x/dylan/svg"
-                  }
-                />
+                {arena?.status === "loading" ? (
+                  <Skeleton variant="circular" height={40} width={40} />
+                ) : (
+                  <Avatar
+                    sizes="small"
+                    src={
+                      profile?.photo ?? "https://api.dicebear.com/9.x/dylan/svg"
+                    }
+                  />
+                )}
               </IconButton>
             </Link>
           </Grid>
@@ -101,37 +105,43 @@ function Top_bar() {
               justifyContent="space-between"
               sx={{ "&::-webkit-scrollbar": { display: "none" } }}
             >
-              {React.Children.toArray(
-                [
-                  { name: "For You", arena_id: 0 },
-                  ...(arena?.following ?? []).map((item) => ({
-                    name: item?.arena?.name,
-                    arena_id: item?.arena_id,
-                  })),
-                ]?.map((item) => (
-                  <Button
-                    key={item.arena_id}
-                    size="small"
-                    color="inherit"
-                    onClick={() => handleChangeArena(item?.arena_id)}
-                    sx={{
-                      fontWeight:
-                        item?.arena_id === arena?.filter?.id ? 700 : 400,
-                      borderBottom:
-                        item?.arena_id === arena?.filter?.id
-                          ? "2px solid #000000"
-                          : "none",
-                      borderRadius: 0,
-                      minHeight: "0px",
-                      minWidth: "fit-content",
-                      fontSize: "14px",
-                      textTransform: "capitalize",
-                    }}
-                  >
-                    {item?.name}
-                  </Button>
-                ))
-              )}
+              {arena?.status === "loading"
+                ? React.Children.toArray(
+                    [...new Array(5)].map((index) => (
+                      <Skeleton key={index} width="60px" height="40px" />
+                    ))
+                  )
+                : React.Children.toArray(
+                    [
+                      { name: "For You", arena_id: 0 },
+                      ...(arena?.following ?? []).map((item) => ({
+                        name: item?.arena?.name,
+                        arena_id: item?.arena_id,
+                      })),
+                    ]?.map((item) => (
+                      <Button
+                        key={item.arena_id}
+                        size="small"
+                        color="inherit"
+                        onClick={() => handleChangeArena(item?.arena_id)}
+                        sx={{
+                          fontWeight:
+                            item?.arena_id === arena?.filter?.id ? 700 : 400,
+                          borderBottom:
+                            item?.arena_id === arena?.filter?.id
+                              ? "2px solid #000000"
+                              : "none",
+                          borderRadius: 0,
+                          minHeight: "0px",
+                          minWidth: "fit-content",
+                          fontSize: "14px",
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {item?.name}
+                      </Button>
+                    ))
+                  )}
             </Box>
           </Grid>
 

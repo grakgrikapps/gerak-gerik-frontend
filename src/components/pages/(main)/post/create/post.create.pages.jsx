@@ -10,6 +10,7 @@ import {
   IconButton,
   Snackbar,
   Alert,
+  Autocomplete,
 } from "@mui/material";
 import ReactPlayer from "react-player";
 import React from "react";
@@ -31,45 +32,26 @@ import MuxPlayer from "@mux/mux-player-react";
 
 import "@uppy/core/dist/style.min.css";
 import "@uppy/dashboard/dist/style.min.css";
+import { useRouter } from "next/navigation";
 
 const validationSchema = yup.object({
-  url: yup
-    .string()
-    .url("Please enter a valid YouTube URL")
-    .required("URL is required"),
+  url: yup.string().required("Video is required"),
   arena_id: yup.string().required("Arena is required"),
   caption: yup.string().max(300, "Maximum 300 characters allowed"),
 });
 
-function normalizeYouTubeUrl(url) {
-  if (!url) return "";
-  const regex =
-    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/;
-  const match = url.match(regex);
-  return match ? `https://www.youtube.com/watch?v=${match[1]}` : url;
-}
-
-function getYoutubeVideoId(url) {
-  if (!url) return null;
-  const regex =
-    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/;
-  const match = url.match(regex);
-  return match ? match[1] : null;
-}
-
 function Post_create_pages({ uploadUrl, id }) {
+  const router = useRouter();
   const [arenaList, setArenaList] = React.useState([]);
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState("");
-  const [normalizedUrl, setNormalizedUrl] = React.useState("");
-  const [videoId, setVideoId] = React.useState(null);
   const [selectedVideo, setSelectedVideo] = React.useState(null);
 
   const [uppy, setUppy] = React.useState(null);
 
   React.useEffect(() => {
     const instance = new Uppy({
-      autoProceed: false,
+      autoProceed: true,
       restrictions: {
         maxNumberOfFiles: 1,
         allowedFileTypes: ["video/*"],
@@ -93,13 +75,11 @@ function Post_create_pages({ uploadUrl, id }) {
       },
     });
 
-    instance.on("upload-success", (file, response) => {
-      http
-        .get(`/videos/mux/${id}`)
-        .then((response) => setSelectedVideo(response.data));
-
-      console.log("✅ Upload success:", file);
-      console.log("📌 Mux Upload URL:", response?.uploadURL);
+    instance.on("upload-success", () => {
+      http.get(`/videos/mux/${id}`).then((response) => {
+        setSelectedVideo(response.data);
+        formik.setFieldValue("url", response.data?.asset?.id);
+      });
     });
 
     instance.on("error", (err) => {
@@ -109,7 +89,7 @@ function Post_create_pages({ uploadUrl, id }) {
     setUppy(instance);
 
     return () => {
-      instance.close();
+      if (instance && instance.close()) instance?.close();
     };
   }, []);
 
@@ -127,10 +107,11 @@ function Post_create_pages({ uploadUrl, id }) {
           ...values,
           description: values.caption,
         });
+
         await http.post("/videos", {
           post_id: request?.data?.id,
           title: "",
-          url: values.url,
+          url: selectedVideo?.asset?.id,
           thumbnail: "",
           duration: "0",
         });
@@ -140,6 +121,8 @@ function Post_create_pages({ uploadUrl, id }) {
 
         resetForm();
         // Redirect or show success message
+
+        router.push(`/posts/${request?.data?.slug}`);
       } catch (err) {
         setSnackbarMessage("Failed to upload post. Please try again.");
         setOpenSnackbar(true);
@@ -155,11 +138,7 @@ function Post_create_pages({ uploadUrl, id }) {
     http.get("/arena").then((response) => setArenaList(response.data));
   }, []);
 
-  React.useEffect(() => {
-    const id = getYoutubeVideoId(formik.values.url);
-    setNormalizedUrl(normalizeYouTubeUrl(formik.values.url));
-    setVideoId(id);
-  }, [formik.values.url]);
+  console.log(formik);
 
   return (
     <Container sx={{ mb: "50px" }}>
@@ -190,80 +169,58 @@ function Post_create_pages({ uploadUrl, id }) {
           Share your favorite YouTube content with
           <br /> the community.
         </Typography>
-        <Typography align="center" color="#687684" fontWeight={400} sx={{mb: '20px'}}>
+        <Typography
+          align="center"
+          color="#687684"
+          fontWeight={400}
+          sx={{ mb: "20px" }}
+        >
           Found something interesting, funny, or inspiring? Just paste the link
           below, we’ll embed it beautifully for you. No need to download or
           reupload.
         </Typography>
 
-        {uppy && !selectedVideo && (
-          <Dashboard
-            theme="light"
-            uppy={uppy}
-            proudlyDisplayPoweredByUppy={false}
-            // note="Pilih file video kamu untuk upload"
-            height={200}
-          />
-        )}
-
-        {selectedVideo && (
-          <div
-            style={{
-              position: "relative",
-              width: "100%",
-              paddingTop: "56.25%", // 16:9 ratio (9/16 = 0.5625)
-              borderRadius: "12px",
-              overflow: "hidden",
-            }}
-          >
-            <MuxPlayer
-              playbackId={selectedVideo?.asset?.id}
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "cover", // biar tetap ter-crop rapi
-              }}
+        <Box mb="20px">
+          {uppy && !selectedVideo && (
+            <Dashboard
+              theme="light"
+              uppy={uppy}
+              proudlyDisplayPoweredByUppy={false}
+              // note="Pilih file video kamu untuk upload"
+              height={200}
             />
-          </div>
-        )}
+          )}
 
-        <Box mt="20px" mb="20px">
-          <Typography fontSize="12px" fontWeight={500} mb="10px">
-            Youtube Link
-          </Typography>
-          <TextField
-            fullWidth
-            size="small"
-            name="url"
-            placeholder="https://www.youtube.com/embed/zJWwZRhyzns"
-            value={formik.values.url}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.url && Boolean(formik.errors.url)}
-            helperText={formik.touched.url && formik.errors.url}
-          />
+          {formik.touched.url && formik.errors.url && (
+            <Typography color="error" sx={{ mt: "5px" }}>
+              {formik.errors.url}
+            </Typography>
+          )}
+
+          {selectedVideo && (
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                paddingTop: "56.25%", // 16:9 ratio (9/16 = 0.5625)
+                borderRadius: "12px",
+                overflow: "hidden",
+              }}
+            >
+              <MuxPlayer
+                playbackId={selectedVideo?.asset?.id}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover", // biar tetap ter-crop rapi
+                }}
+              />
+            </div>
+          )}
         </Box>
-
-        {normalizedUrl && ReactPlayer.canPlay(normalizedUrl) && (
-          <ReactPlayer
-            key={normalizedUrl}
-            width="100%"
-            height="300px"
-            style={{
-              borderRadius: "8px",
-              overflow: "hidden",
-              marginBottom: "15px",
-              height: "300px",
-              minHeight: "300px",
-            }}
-            src={normalizedUrl}
-            muted
-            controls
-          />
-        )}
 
         <Typography fontSize="12px" fontWeight={500} mb="10px">
           Caption
@@ -285,27 +242,80 @@ function Post_create_pages({ uploadUrl, id }) {
           Arena
         </Typography>
         <Box mb="15px">
-          <Select
+          <Autocomplete
+            disablePortal
+            options={arenaList}
+            getOptionLabel={(props) => props.name}
+            fullWidth
+            size="small"
+            onChange={(e, value) => {
+              formik.setFieldValue("arena_id", value ? value.id : null);
+              formik.setFieldTouched("arena_id", false); // jangan langsung true
+            }}
+            onBlur={() => formik.setFieldTouched("arena_id", true)}
+            disableClearable
+            renderOption={(props, option) => {
+              const { key, ...optionProps } = props;
+              return (
+                <Box
+                  key={key}
+                  component="li"
+                  sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                  {...optionProps}
+                >
+                  <img
+                    loading="lazy"
+                    width="20"
+                    srcSet={
+                      option?.photo
+                        ? option?.photo
+                        : `https://api.dicebear.com/9.x/initials/svg?seed=${option.name}`
+                    }
+                    src={
+                      option?.photo
+                        ? option?.photo
+                        : `https://api.dicebear.com/9.x/initials/svg?seed=${option.name}`
+                    }
+                    alt=""
+                  />
+                  {option.name}
+                </Box>
+              );
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Select arena" />
+            )}
+          />
+
+          {/* <Select
             size="small"
             sx={{ borderRadius: "8px", minHeight: "40px" }}
             fullWidth
             name="arena_id"
-            value={formik.values.arena_id}
+            value={formik.values?.arena_id ?? ""}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={formik.touched.arena_id && Boolean(formik.errors.arena_id)}
+            error={formik.touched.arena_id && formik.errors.arena_id}
             displayEmpty
           >
-            <MenuItem value={null} selected hidden disabled>
+            <MenuItem selected hidden disabled>
               Select Arena
             </MenuItem>
             {React.Children.toArray(
-              arenaList?.map((item) => (
+              (arenaList ?? [])?.map((item) => (
                 <MenuItem value={item?.id}>{item?.name}</MenuItem>
               ))
             )}
-          </Select>
+          </Select> */}
+
+          {formik.touched.arena_id && formik.errors.arena_id && (
+            <Typography color="error" sx={{ mt: "5px" }}>
+              {formik.errors.arena_id}
+            </Typography>
+          )}
         </Box>
+
+        {console.log(formik)}
 
         <Button
           variant="contained"
