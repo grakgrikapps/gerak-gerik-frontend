@@ -94,6 +94,10 @@ const theme = createTheme({
           color: "#fff",
           textTransform: "capitalize",
         },
+        outlinedInherit: {
+          textTransform: "capitalize",
+          color: neutral?.[700],
+        },
         containedSizeLarge: {
           borderRadius: "10px",
           color: "#fff",

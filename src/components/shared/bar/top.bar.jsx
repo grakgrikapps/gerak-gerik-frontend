@@ -96,54 +96,73 @@ function Top_bar() {
             </Link>
           </Grid>
 
-          <Grid size={{ xs: 10.4, md: 10.5 }}>
-            <Box
-              mt={0.5}
-              gap={2}
-              display="flex"
-              overflow="auto"
-              justifyContent="space-between"
-              sx={{ "&::-webkit-scrollbar": { display: "none" } }}
-            >
-              {arena?.status === "loading"
-                ? React.Children.toArray(
-                    [...new Array(5)].map((index) => (
-                      <Skeleton key={index} width="60px" height="40px" />
-                    ))
-                  )
-                : React.Children.toArray(
-                    [
-                      { name: "For You", arena_id: 0 },
-                      ...(arena?.following ?? []).map((item) => ({
-                        name: item?.arena?.name,
-                        arena_id: item?.arena_id,
-                      })),
-                    ]?.map((item) => (
-                      <Button
-                        key={item.arena_id}
-                        size="small"
-                        color="inherit"
-                        onClick={() => handleChangeArena(item?.arena_id)}
-                        sx={{
-                          fontWeight:
-                            item?.arena_id === arena?.filter?.id ? 700 : 400,
-                          borderBottom:
-                            item?.arena_id === arena?.filter?.id
-                              ? "2px solid #000000"
-                              : "none",
-                          borderRadius: 0,
-                          minHeight: "0px",
-                          minWidth: "fit-content",
-                          fontSize: "14px",
-                          textTransform: "capitalize",
-                        }}
-                      >
-                        {item?.name}
-                      </Button>
-                    ))
-                  )}
-            </Box>
-          </Grid>
+          {profile?.id && (
+            <Grid size={{ xs: 10.4, md: 10.5 }}>
+              <Box
+                mt={0.5}
+                gap={2}
+                display="flex"
+                overflow="auto"
+                justifyContent="space-between"
+                sx={{ "&::-webkit-scrollbar": { display: "none" } }}
+              >
+                {arena?.status === "loading"
+                  ? React.Children.toArray(
+                      [...new Array(5)].map((index) => (
+                        <Skeleton key={index} width="60px" height="40px" />
+                      ))
+                    )
+                  : React.Children.toArray(
+                      [
+                        { name: "For You", arena_id: 0 },
+                        ...(arena?.following ?? []).map((item) => ({
+                          name: item?.arena?.name,
+                          arena_id: item?.arena_id,
+                        })),
+                      ]?.map((item) => (
+                        <Button
+                          key={item.arena_id}
+                          size="small"
+                          color="inherit"
+                          onClick={() => handleChangeArena(item?.arena_id)}
+                          sx={{
+                            fontWeight:
+                              item?.arena_id === arena?.filter?.id ? 700 : 400,
+                            borderBottom:
+                              item?.arena_id === arena?.filter?.id
+                                ? "2px solid #000000"
+                                : "none",
+                            borderRadius: 0,
+                            minHeight: "0px",
+                            minWidth: "fit-content",
+                            fontSize: "14px",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {item?.name}
+                        </Button>
+                      ))
+                    )}
+              </Box>
+            </Grid>
+          )}
+
+          {!profile?.id && arena?.status !== "loading" && (
+            <Grid size={{ xs: 4 }}>
+              <Box display="flex" justifyContent="flex-end" gap={1}>
+                <Link href="/login" passHref>
+                  <Button variant="outlined" color="inherit">
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/register" passHref>
+                  <Button variant="contained" color="inherit">
+                    Register
+                  </Button>
+                </Link>
+              </Box>
+            </Grid>
+          )}
 
           {/* <Grid size={{ xs: 1 }}>
             <IconButton size="small">
