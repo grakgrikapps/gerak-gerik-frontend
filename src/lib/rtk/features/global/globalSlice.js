@@ -8,7 +8,7 @@ const initialState = {
     body: "Your vote can't be counted because you're not logged in. Please login first.",
     buttonAccept: "Submit",
     buttonCancel: "Cancel",
-  },
+  }
 };
 
 // Slice definition

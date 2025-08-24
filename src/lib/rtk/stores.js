@@ -5,6 +5,7 @@ import { arenaSlice } from "./features/arena/arenaSlice";
 import { commentsSlice } from "./features/comments/commentSlice";
 import { globalSlice } from "./features/global/globalSlice";
 import { persistStore, persistReducer } from "redux-persist";
+import { metaDataSlice } from "./features/metadata/metadataSlice";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
 
 // Gabungkan slice
@@ -13,14 +14,15 @@ const rootReducer = combineSlices(
   authSlice,
   arenaSlice,
   commentsSlice,
-  globalSlice
+  globalSlice,
+  metaDataSlice
 );
 
 // Konfigurasi persist
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: [postsSlice.name, authSlice.name], // hanya persist state `counter`, jangan quotesApi
+  whitelist: [postsSlice.name, authSlice.name, metaDataSlice.name], // hanya persist state `counter`, jangan quotesApi
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

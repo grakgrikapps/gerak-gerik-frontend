@@ -4,11 +4,17 @@ import Empty_layout from "@/components/layout/_empty.layout";
 import { Box, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 
 function Page() {
   const router = useRouter();
+  const meta = useSelector((state) => state.metadata);
 
   React.useEffect(() => {
+    if (meta.version !== "1.0.0") {
+      router.replace("/logout");
+    }
+
     router.replace("/home");
   }, []);
 
