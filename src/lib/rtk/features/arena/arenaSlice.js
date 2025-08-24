@@ -19,9 +19,11 @@ export const arenaSlice = createAppSlice({
     }),
     setSelectedArena: create.reducer((state, action) => {
       state.filter.id = action?.payload ?? 0;
+      state.status = "idle";
     }),
     setArena: create.reducer((state, action) => {
       state.list = action?.payload;
+      state.status = "idle";
     }),
     // setCurrentArena: create.reducer((state, action) => {
     //   state.current = action.payload;
@@ -30,4 +32,5 @@ export const arenaSlice = createAppSlice({
 });
 
 // Action creators
-export const { setFollowingArena, setSelectedArena, setArena } = arenaSlice.actions;
+export const { setFollowingArena, setSelectedArena, setArena } =
+  arenaSlice.actions;
